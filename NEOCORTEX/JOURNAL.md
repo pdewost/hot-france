@@ -3,6 +3,20 @@
 
 ---
 
+### 2026-06-25 | Phase 2 COMPLETE — calibration VALIDATED (1.145% vs Noll 1.2%)
+
+- Delegated build + independent adversarial verify (Sonnet@High, workflow wsoix6y8x). Verdict PASS, 0 bugs.
+- Built `src/core/france.py` (metropolitan mask via NE 10m admin_0_map_units GEOUNIT='France' + shapely.vectorized
+  + bbox belt-and-suspenders; 1033 cells, lat 41.5..51.0, lon −4.75..9.5, DOM-leak check PASS),
+  `src/core/threshold.py` (`france_threshold` max/percentile; `planet_fraction_hotter` cos-lat area-weighted,
+  strictly >), `scripts/phase2_calibration.py`. Installed cartopy/shapely/pyproj/matplotlib/pillow into venv.
+- **Calibration:** Mon 22 = **1.145%** planet hotter than France (max 41.53 °C) vs Noll **1.2%** (Δ 0.055 pp).
+  Tue 23 = 0.767% (42.10 °C), Wed 24 = 0.764% (42.04 °C). All-surface matches Noll; land-only (3.96%) does not
+  ⇒ Noll computed whole-planet. Methodology reproduced.
+- **Honest nuance:** our IFS 00z grid daily-max has Tue (42.10) ≈ Wed (42.04) — Tue marginally higher; the
+  real-world "Wed broke Tue's record" is a *station-observation* record, not the 0.25° model grid (which ties them).
+- Gotcha: cartopy NE auto-download SSL cert failure (Py3.12/macOS) → pre-fetched shapefiles via certifi, cached.
+
 ### 2026-06-25 | Phase 1 COMPLETE — ECMWF IFS loader built + triple-verified
 
 - Delegated build to Sonnet@High + independent Sonnet@High adversarial verifier (workflow w3rgycenw).

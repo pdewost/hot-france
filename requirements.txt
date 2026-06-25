@@ -1,5 +1,8 @@
-# Phase 1 GRIB stack — pinned versions
+# Phase 1 + Phase 2 stack — pinned versions
 # Generated 2026-06-25 from .venv/bin/pip freeze
+# Phase 2 additions (cartopy for NE boundaries + shapely for rasterization):
+cartopy==0.25.0
+shapely==2.1.2
 # Core 6:
 ecmwf-opendata==0.3.30
 cfgrib==0.9.15.1
