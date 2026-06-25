@@ -3,6 +3,16 @@
 
 ---
 
+### 2026-06-25 | Page layout v2 — featured latest + 2-up + click-to-zoom lightbox
+
+- Founder request: feature the latest day full-width with the two previous side by side below; click a
+  map to view it full page width, click again to return.
+- `site/index.html`: `#days` now a 2-col grid; latest day card gets `.day-card--featured` (grid-column 1/-1),
+  the two previous render below (newest first) via `dayCardHtml(day, featured)`. Added a lightbox
+  (`#lightbox` + `openLightbox`/`closeLightbox`, Esc to close, `closeHint` i18n key → 20/20 FR/EN parity).
+  Maps are `cursor:zoom-in`; lightbox img = `width:100vw` high-res.
+- Verified headless (Chrome screenshot): featured Wed 24 on top, Tue 23 + Mon 22 below. 20/20 i18n parity.
+
 ### 2026-06-25 | Phase 3 COMPLETE — 6 theme-aware Robinson maps; project deliverable shipped
 
 - Delegated render + verify (Sonnet@High, wf wqxycldlf). `src/render/wapo_map.py` (render_map + THEMES) +
