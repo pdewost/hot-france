@@ -3,6 +3,21 @@
 
 ---
 
+### 2026-06-25 | Phase 3 COMPLETE — 6 theme-aware Robinson maps; project deliverable shipped
+
+- Delegated render + verify (Sonnet@High, wf wqxycldlf). `src/render/wapo_map.py` (render_map + THEMES) +
+  `scripts/phase3_render.py`. 6 PNGs (3 days × light/dark), 1600×900, France blank, hot area 0.80→0.54→0.53%
+  (correct shrinking trend), deserts glowing. cartopy coastline SSL pre-fetched via certifi (same as Phase 2).
+- **Founder (Opus) review caught two things the render-verifier missed/mis-stated:** (1) the map *read* as
+  flat — fixed by giving the ocean (`ax.patch`) a distinct fill vs the figure bg + a faint globe outline, so
+  the Robinson projection now reads as a globe (it always WAS Robinson; ocean==bg hid the curvature);
+  (2) verifier's `hot_px_pct` was actually a grid-cell fraction → renamed `hot_cell_pct` + docstring fixed.
+  Re-rendered; visually confirmed both dark + light variants by reading the PNGs.
+- Map bg matches `--bg-card` per theme ⇒ globe floats seamlessly in the cards. object-fit cover on 16:9
+  image into 16:9 card = exact fit.
+- Wrote `CALIBRATION.md` (validation evidence). Page now complete: panels filled, maps swap with day/night.
+- **Deliverable shipped.** Optional remainder: Phase 5 ERA5 backfill (~29 Jun).
+
 ### 2026-06-25 | Presentation page built (Apple-50 template adapted)
 
 - Delegated adapt + verify (Sonnet@High, wf w1oxl0p64). Located template at

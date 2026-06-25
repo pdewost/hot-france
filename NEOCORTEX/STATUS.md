@@ -8,12 +8,11 @@ Reproduce — and be able to regenerate — Ben Noll's WaPo "ECMWF-based" world 
 maps, calibrated against Noll's quoted planet-fraction figures (~1.2% / 0.93%).
 
 ## Current phase
-**Phase 2 COMPLETE — CALIBRATION VALIDATED** — 2026-06-25. Metropolitan-France mask (1033 cells, DOM-leak
-check PASS) + single-cell threshold + cos-lat planet-fraction, built + independently verified (PASS, 0 bugs).
-**Mon 22: 1.145% planet hotter vs Noll's 1.2% (Δ 0.055 pp) → methodology reproduced.** All-surface matches
-Noll far better than land-only (3.96%) ⇒ Noll computed over the whole planet.
-Per-day: Mon 41.53 °C/1.145% · Tue 42.10 °C/0.767% · Wed 42.04 °C/0.764%.
-Next: **Phase 3** (render WaPo-style maps) → **Phase 4** (wire real numbers + maps into `site/` page).
+**Phases 1–3 COMPLETE + page shipped** — 2026-06-25. End-to-end works: loader → France mask → threshold →
+calibration (Mon 1.145% vs Noll 1.2% ✅) → 6 theme-aware Robinson maps → bilingual dark/light `site/index.html`
+with maps wired in. All stages independently verified; maps visually confirmed (deserts glow, France blank,
+hot area shrinks Mon→Wed). `CALIBRATION.md` written. Nested git repo committed.
+Remaining (optional): Phase 5 — ERA5 backfill (~29 Jun, when ERA5T covers 22–24 Jun) for a reanalysis cross-check.
 
 ## Invariants
 1. **Data source = ECMWF IFS forecast (`oper`, param `mx2t3`), NOT ERA5** for these dates. ERA5/ERA5T
@@ -25,19 +24,15 @@ Next: **Phase 3** (render WaPo-style maps) → **Phase 4** (wire real numbers + 
 4. **Calibration is quantitative**, not pixel-diff (original image is paywalled): reproduce Noll's ~1.2%/0.93% within tolerance.
 5. **Faithful threshold = single hottest France cell** (matches "France's hottest place"); percentile is a labelled sensitivity variant only.
 
-## Next actions
-1. **Phase 3** — `src/render/wapo_map.py`: vectorized `where(t > france_max)` mask + WaPo-style world map
-   (Cartopy Robinson, set_bad lightgray, fixed vmin/vmax, add_cyclic_point) per day → `outputs/*.png`.
-   Honest caption (source/variable/threshold/window). Reuse `metropolitan_france_mask` + `france_threshold`.
-2. **Phase 4** — copy chosen maps → `site/assets/maps/hotter_than_france_<date>.png`; wire the real numbers
-   into the page DATA (Mon 41.53 °C/1.145% · Tue 42.10/0.767% · Wed 42.04/0.764%); write `outputs/CALIBRATION.md`.
-3. **Page** ✅ — `site/index.html` (Apple-50 template adapted, FR/EN + dark/light, theme/lang persisted)
-   built + wired with real Phase 2 numbers + Tue/Wed model-vs-observation footnote. Maps pending (Phase 3)
-   show graceful "Map pending" placeholders. i18n 15/15 keys parity. Open in a browser to view.
-4. Phase 5 (optional, ~29 Jun+) — ERA5 backfill via corrected CDS; forecast-vs-reanalysis diff.
+## Next actions (all optional — core deliverable shipped)
+1. Phase 5 (~29 Jun+) — ERA5 backfill via corrected CDS once ERA5T covers 22–24 Jun; forecast-vs-reanalysis diff.
+2. If desired: serve/share the page (any static server over `site/`), or add more days as the heatwave evolves.
+3. If desired: confirm Noll's exact IFS sub-product (HRES/ENS/AIFS) by emailing him; we used deterministic `oper`.
 
 ✅ Done 2026-06-25: scaffold; source-workflow challenge (verified); Phase 0 probe (ECMWF IFS, mx2t3);
-**Phase 1 loader**; **Phase 2 mask+threshold+calibration (1.145% vs 1.2% ✅)**; nested git repo.
+**Phase 1 loader**; **Phase 2 mask+threshold+calibration (1.145% vs 1.2% ✅)**; **Phase 3 render — 6
+theme-aware Robinson maps** (visually confirmed); **bilingual dark/light page** (`site/index.html`, maps wired,
+Tue/Wed footnote, 19/19 i18n parity); `CALIBRATION.md`; nested git repo (3 commits).
 
 ## Pointers
 - Source proposal (as pasted): `../GUIDELINES_source_workflow.md`

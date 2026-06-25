@@ -99,15 +99,10 @@ body {
 .site-title {
   font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
   display: flex; align-items: center; gap: 8px; white-space: nowrap;
-  color: var(--text-primary);
-  text-decoration: none;
+  color: var(--text-primary); text-decoration: none;
 }
-.site-title .glyph {
-  font-size: 1.3rem; line-height: 1;
-}
-.header-controls {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
+.site-title .glyph { font-size: 1.3rem; line-height: 1; }
+.header-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
 .btn {
   display: inline-flex; align-items: center; gap: 6px;
@@ -121,41 +116,30 @@ body {
 .lang-toggle {
   display: inline-flex; gap: 0; align-items: center;
   border: 1px solid var(--border); border-radius: 8px;
-  overflow: hidden; font-size: 0.9rem; cursor: pointer;
-  vertical-align: middle;
+  overflow: hidden; font-size: 0.9rem; cursor: pointer; vertical-align: middle;
 }
 .lang-toggle span {
-  padding: 3px 6px; transition: all var(--transition-fast); line-height: 1;
-  opacity: 0.4;
+  padding: 3px 6px; transition: all var(--transition-fast); line-height: 1; opacity: 0.4;
 }
 .lang-toggle span.active { opacity: 1; background: var(--accent-light); }
 .lang-toggle span:hover { opacity: 0.8; }
 
 /* ── MAIN ── */
-main {
-  max-width: 960px; margin: 0 auto; padding: 40px 24px;
-}
+main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 
 /* ── HERO ── */
-.hero {
-  text-align: center;
-  padding: 48px 0 40px;
-}
+.hero { text-align: center; padding: 48px 0 40px; }
 .hero-title {
   font-family: var(--font-display); font-weight: 700;
   font-size: clamp(2.4rem, 6vw, 4rem);
-  letter-spacing: -0.02em;
-  line-height: 1.1;
+  letter-spacing: -0.02em; line-height: 1.1;
   background: linear-gradient(135deg, var(--heat) 0%, #FF3B30 50%, #FF9F0A 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   margin-bottom: 16px;
 }
 .hero-tagline {
   font-size: clamp(1rem, 2.5vw, 1.2rem);
-  color: var(--text-secondary);
-  max-width: 680px; margin: 0 auto;
-  line-height: 1.6;
+  color: var(--text-secondary); max-width: 680px; margin: 0 auto; line-height: 1.6;
 }
 
 /* ── RECORD CALLOUT ── */
@@ -163,144 +147,86 @@ main {
   background: var(--record-bg);
   border: 1.5px solid var(--record-border);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
-  margin: 0 0 40px;
+  padding: 20px 24px; margin: 0 0 40px;
   display: flex; align-items: flex-start; gap: 14px;
 }
-.record-icon {
-  font-size: 1.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px;
-}
-.record-text {
-  font-size: 1rem;
-  color: var(--record-text);
-  line-height: 1.6;
-  font-weight: 500;
-}
+.record-icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.record-text { font-size: 1rem; color: var(--record-text); line-height: 1.6; font-weight: 500; }
 
 /* ── DAY PANELS ── */
-.days-section {
-  margin-bottom: 48px;
-}
-.days-section-title {
-  font-family: var(--font-display); font-weight: 600; font-size: 1.1rem;
-  color: var(--text-tertiary); letter-spacing: 0.04em; text-transform: uppercase;
-  font-size: 0.75rem; margin-bottom: 16px;
-}
+.days-section { margin-bottom: 48px; }
 #days {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 20px;
 }
 .model-note {
-  margin-top: 16px;
-  font-size: 0.78rem;
-  font-style: italic;
-  color: var(--text-tertiary);
-  line-height: 1.55;
-  max-width: 760px;
+  margin-top: 16px; font-size: 0.78rem; font-style: italic;
+  color: var(--text-tertiary); line-height: 1.55; max-width: 760px;
 }
-
 .day-card {
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  background: var(--bg-card); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); overflow: hidden;
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-fast), transform var(--transition-fast);
 }
-.day-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
-}
+.day-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
 .day-card-header {
-  padding: 14px 16px 10px;
-  border-bottom: 1px solid var(--border-light);
+  padding: 14px 16px 10px; border-bottom: 1px solid var(--border-light);
 }
 .day-label {
-  font-family: var(--font-display); font-weight: 600; font-size: 1rem;
-  color: var(--text-primary);
+  font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--text-primary);
 }
+
+/* figure wraps map + stats caption */
+.day-figure { margin: 0; display: flex; flex-direction: column; }
 
 .day-map-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 16/9;
-  background: var(--bg-primary);
-  overflow: hidden;
+  position: relative; width: 100%; aspect-ratio: 16/9;
+  background: var(--bg-primary); overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
-.day-map-wrap img {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  display: block;
-}
+.day-map-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .map-placeholder {
-  display: none;
-  flex-direction: column;
+  display: none; flex-direction: column;
   align-items: center; justify-content: center;
-  gap: 8px;
-  width: 100%; height: 100%;
-  background: var(--bg-primary);
-  color: var(--text-tertiary);
-  font-size: 0.82rem;
-  font-style: italic;
-  text-align: center;
-  padding: 16px;
+  gap: 8px; position: absolute; inset: 0;
+  background: var(--bg-primary); color: var(--text-tertiary);
+  font-size: 0.82rem; font-style: italic; text-align: center; padding: 16px;
 }
-.map-placeholder-icon {
-  font-size: 2rem; line-height: 1; opacity: 0.4;
-}
+.map-placeholder-icon { font-size: 2rem; line-height: 1; opacity: 0.4; }
 
 .day-stats {
-  padding: 14px 16px;
-  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 10px;
 }
-.day-stat {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 8px;
-}
-.day-stat-label {
-  font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500;
-}
+.day-stat { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.day-stat-label { font-size: 0.75rem; color: var(--text-tertiary); font-weight: 500; }
 .day-stat-value {
   font-family: var(--font-display); font-weight: 700; font-size: 1.15rem;
-  color: var(--heat); font-variant-numeric: tabular-nums;
-  white-space: nowrap;
+  color: var(--heat); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
-.day-stat-value.null-val {
-  color: var(--text-tertiary); font-size: 1rem;
-}
+.day-stat-value.null-val { color: var(--text-tertiary); font-size: 1rem; }
 
 /* ── METHODOLOGY ── */
 .method-section {
-  background: var(--method-bg);
-  border: 1px solid var(--border-light);
-  border-radius: var(--radius-lg);
-  padding: 28px 28px 24px;
-  margin-bottom: 0;
+  background: var(--method-bg); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); padding: 28px 28px 24px; margin-bottom: 0;
 }
 .method-title {
   font-family: var(--font-display); font-weight: 600; font-size: 1.05rem;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary); margin-bottom: 16px;
+  padding-bottom: 10px; border-bottom: 1px solid var(--border-light);
 }
-.method-list {
-  list-style: none; padding: 0; margin: 0;
-  display: flex; flex-direction: column; gap: 12px;
-}
+.method-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
 .method-list li {
   display: flex; gap: 12px; align-items: flex-start;
   font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6;
 }
 .method-num {
-  flex-shrink: 0;
-  width: 22px; height: 22px; border-radius: 50%;
-  background: var(--accent-light);
-  color: var(--accent);
+  flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+  background: var(--accent-light); color: var(--accent);
   font-size: 0.7rem; font-weight: 700;
-  display: flex; align-items: center; justify-content: center;
-  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center; margin-top: 1px;
 }
 
 /* ── FOOTER ── */
@@ -308,18 +234,14 @@ main {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
   background: var(--footer-bg);
   backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-top: 1px solid var(--border-light);
-  padding: 12px 24px;
+  border-top: 1px solid var(--border-light); padding: 12px 24px;
   transition: background var(--transition-medium);
 }
 .footer-inner {
   display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; flex-wrap: wrap; max-width: 960px; margin: 0 auto;
-  font-size: 0.78rem;
+  gap: 16px; flex-wrap: wrap; max-width: 960px; margin: 0 auto; font-size: 0.78rem;
 }
-.footer-stat {
-  display: flex; flex-direction: column; align-items: flex-start; gap: 1px;
-}
+.footer-stat { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 .footer-stat.center { align-items: center; }
 .footer-label { color: var(--text-tertiary); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; }
 .footer-value { font-weight: 500; color: var(--text-secondary); }
@@ -329,7 +251,7 @@ main {
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.hero        { animation: fadeUp 0.5s ease both; }
+.hero          { animation: fadeUp 0.5s ease both; }
 .record-banner { animation: fadeUp 0.5s 0.1s ease both; }
 .days-section  { animation: fadeUp 0.5s 0.15s ease both; }
 .method-section { animation: fadeUp 0.5s 0.2s ease both; }
@@ -357,11 +279,12 @@ main {
 <header class="site-header">
   <div class="header-top">
     <div class="site-title">
-      <span class="glyph">&#9728;&#65039;</span>
+      <span class="glyph" aria-hidden="true">&#9728;&#65039;</span>
       <span data-i18n="title">Hotter than France</span>
     </div>
     <div class="header-controls">
-      <span class="lang-toggle" onclick="toggleLang()" title="Switch language / Changer de langue">
+      <span class="lang-toggle" onclick="toggleLang()" title="Switch language / Changer de langue"
+            role="button" aria-label="Switch language">
         <span id="flagEn">&#127482;&#127480;</span><span id="flagFr">&#127467;&#127479;</span>
       </span>
       <button class="btn" id="btnTheme" onclick="toggleTheme()" title="Toggle dark mode">&#127769;</button>
@@ -378,14 +301,14 @@ main {
   </section>
 
   <!-- RECORD CALLOUT -->
-  <div class="record-banner" role="note" aria-label="Record">
+  <div class="record-banner" role="note">
     <span class="record-icon" aria-hidden="true">&#128293;</span>
     <p class="record-text" data-i18n="record">Tuesday 23 June 2026 was France's hottest day on record — until Wednesday 24 June broke the record again.</p>
   </div>
 
   <!-- DAY PANELS -->
-  <section class="days-section">
-    <div id="days" aria-label="Day panels"></div>
+  <section class="days-section" aria-label="Day panels">
+    <div id="days"></div>
     <p class="model-note" data-i18n="modelNote">Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official “record broken” figures are station observations — a separate measure.</p>
   </section>
 
@@ -393,8 +316,8 @@ main {
   <section class="method-section" aria-labelledby="methodHeading">
     <h2 class="method-title" id="methodHeading" data-i18n="methodTitle">How this was made</h2>
     <ul class="method-list">
-      <li><span class="method-num" aria-hidden="true">1</span><span data-i18n="methodData">Global 2-metre maximum temperature from ECMWF's IFS operational forecast (0.25°) — the same model family The Washington Post used.</span></li>
-      <li><span class="method-num" aria-hidden="true">2</span><span data-i18n="methodThreshold">'Hotter than France' means hotter than the single hottest grid cell in metropolitan France that day.</span></li>
+      <li><span class="method-num" aria-hidden="true">1</span><span data-i18n="methodData">Global 2-metre maximum temperature from ECMWF's IFS operational forecast (0.25 degrees) — the same model family The Washington Post used.</span></li>
+      <li><span class="method-num" aria-hidden="true">2</span><span data-i18n="methodThreshold">"Hotter than France" means hotter than the single hottest grid cell in metropolitan France that day.</span></li>
       <li><span class="method-num" aria-hidden="true">3</span><span data-i18n="methodFraction">The percentage is the cosine-latitude area-weighted share of the globe exceeding that threshold.</span></li>
       <li><span class="method-num" aria-hidden="true">4</span><span data-i18n="methodCredit">Inspired by Ben Noll (The Washington Post). This is an independent reconstruction — not the original graphic.</span></li>
     </ul>
@@ -418,87 +341,106 @@ main {
 
 <script>
 // ── DATA ──
-// Per-day values = hottest 0.25° ECMWF IFS grid cell (00 UTC run); planetPct = cos-lat
-// area-weighted % of the globe strictly hotter than that cell. Calibration: 22 Jun 1.15% vs Noll 1.2%.
-const DATA = [
+// Per-day = hottest 0.25° ECMWF IFS grid cell (00 UTC run); planetPct = cos-lat area-weighted
+// % of the globe strictly hotter than that cell. Calibration: 22 Jun 1.15% vs Noll's 1.2%.
+var DATA = [
   {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    franceMaxC:41.5, planetPct:1.15},
   {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    franceMaxC:42.1, planetPct:0.77},
-  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', franceMaxC:42.0, planetPct:0.76},
+  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', franceMaxC:42.0, planetPct:0.76}
 ];
 
 // ── I18N ──
-const STRINGS = {
+// All string values use double-quotes to safely contain French apostrophes.
+var STRINGS = {
   en: {
-    title:           'Hotter than France',
-    tagline:         "June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France’s hottest place.",
-    record:          "Tuesday 23 June 2026 was France’s hottest day on record — until Wednesday 24 June broke the record again.",
-    franceMax:       "France’s hottest",
-    planetHotter:    'Planet hotter than France',
-    mapPending:      'Map pending',
-    modelNote:       'Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official “record broken” figures are station observations — a separate measure.',
-    methodTitle:     'How this was made',
-    methodData:      "Global 2-metre maximum temperature from ECMWF’s IFS operational forecast (0.25°) — the same model family The Washington Post used.",
-    methodThreshold: "‘Hotter than France’ means hotter than the single hottest grid cell in metropolitan France that day.",
-    methodFraction:  'The percentage is the cosine-latitude area-weighted share of the globe exceeding that threshold.',
-    methodCredit:    'Inspired by Ben Noll (The Washington Post). This is an independent reconstruction — not the original graphic.',
-    footerData:      'Data: ECMWF IFS · Independent reconstruction, not affiliated with The Washington Post',
-    footerDataLabel: 'Data',
-    footerGeneratedLabel: 'Generated',
+    title:                "Hotter than France",
+    tagline:              "June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France’s hottest place.",
+    record:               "Tuesday 23 June 2026 was France’s hottest day on record — until Wednesday 24 June broke the record again.",
+    franceMax:            "France’s hottest",
+    planetHotter:         "Planet hotter than France",
+    mapPending:           "Map pending",
+    modelNote:            "Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official “record broken” figures are station observations — a separate measure.",
+    methodTitle:          "How this was made",
+    methodData:           "Global 2-metre maximum temperature from ECMWF’s IFS operational forecast (0.25°) — the same model family The Washington Post used.",
+    methodThreshold:      "“Hotter than France” means hotter than the single hottest grid cell in metropolitan France that day.",
+    methodFraction:       "The percentage is the cosine-latitude area-weighted share of the globe exceeding that threshold.",
+    methodCredit:         "Inspired by Ben Noll (The Washington Post). This is an independent reconstruction — not the original graphic.",
+    footerData:           "Data: ECMWF IFS · Independent reconstruction, not affiliated with The Washington Post",
+    footerDataLabel:      "Data",
+    footerGeneratedLabel: "Generated",
+    docTitle:             "Hotter than France — June 2026 European heatwave",
+    dayPanelsLabel:       "Daily panels",
+    themeBtnTitle:        "Toggle dark mode",
+    langBtnTitle:         "Switch language"
   },
   fr: {
-    title:           'Plus chaud que la France',
-    tagline:         "Juin 2026 — au plus fort de la canicule européenne, seule une infime partie de la planète était plus chaude que l’endroit le plus chaud de France.",
-    record:          "Le mardi 23 juin 2026 fut le jour le plus chaud jamais enregistré en France — jusqu’à ce que le mercredi 24 juin batte de nouveau le record.",
-    franceMax:       'Maximum en France',
-    planetHotter:    'Planète plus chaude que la France',
-    mapPending:      'Carte à venir',
-    modelNote:       'Les valeurs quotidiennes correspondent à la cellule de grille la plus chaude du modèle (0,25°, IFS CEPMMT, run 00 UTC). À cette résolution, mardi et mercredi sont quasi à égalité (~42 °C) ; les records officiels « battus » sont des relevés de stations — une mesure distincte.',
-    methodTitle:     'Méthode',
-    methodData:      "Température maximale à 2 mètres, monde entier, issue de la prévision opérationnelle IFS du CEPMMT (0,25°) — la même famille de modèles que celle utilisée par le Washington Post.",
-    methodThreshold: "« Plus chaud que la France » signifie plus chaud que la cellule la plus chaude de France métropolitaine ce jour-là.",
-    methodFraction:  'Le pourcentage correspond à la part de la surface du globe dépassant ce seuil, pondérée par la surface (cosinus de la latitude).',
-    methodCredit:    'Inspiré de Ben Noll (The Washington Post). Reconstruction indépendante — il ne s’agit pas du graphique original.',
-    footerData:      'Données : IFS CEPMMT · Reconstruction indépendante, sans affiliation avec le Washington Post',
-    footerDataLabel: 'Données',
-    footerGeneratedLabel: 'Généré',
+    title:                "Plus chaud que la France",
+    tagline:              "Juin 2026 — au plus fort de la canicule européenne, seule une infime partie de la planète était plus chaude que l’endroit le plus chaud de France.",
+    record:               "Le mardi 23 juin 2026 fut le jour le plus chaud jamais enregistré en France — jusqu’à ce que le mercredi 24 juin batte de nouveau le record.",
+    franceMax:            "Maximum en France",
+    planetHotter:         "Planète plus chaude que la France",
+    mapPending:           "Carte à venir",
+    modelNote:            "Les valeurs quotidiennes correspondent à la cellule de grille la plus chaude du modèle (0,25°, IFS CEPMMT, run 00 UTC). À cette résolution, mardi et mercredi sont quasi à égalité (~42 °C) ; les records officiels « battus » sont des relevés de stations — une mesure distincte.",
+    methodTitle:          "Méthode",
+    methodData:           "Température maximale à 2 mètres, monde entier, issue de la prévision opérationnelle IFS du CEPMMT (0,25°) — la même famille de modèles que celle utilisée par le Washington Post.",
+    methodThreshold:      "« Plus chaud que la France » signifie plus chaud que la cellule la plus chaude de France métropolitaine ce jour-là.",
+    methodFraction:       "Le pourcentage correspond à la part de la surface du globe dépassant ce seuil, pondérée par la surface (cosinus de la latitude).",
+    methodCredit:         "Inspiré de Ben Noll (The Washington Post). Reconstruction indépendante — il ne s’agit pas du graphique original.",
+    footerData:           "Données : IFS CEPMMT · Reconstruction indépendante, sans affiliation avec le Washington Post",
+    footerDataLabel:      "Données",
+    footerGeneratedLabel: "Généré",
+    docTitle:             "Plus chaud que la France — canicule européenne, juin 2026",
+    dayPanelsLabel:       "Panneaux journaliers",
+    themeBtnTitle:        "Basculer le mode sombre",
+    langBtnTitle:         "Changer de langue"
   }
 };
 
-function t(k) { return STRINGS[state.lang]?.[k] || STRINGS.en[k] || k; }
-
-// ── STATE (with localStorage persistence) ──
-function detectSystemTheme() {
-  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+function t(k) {
+  return (STRINGS[state.lang] && STRINGS[state.lang][k]) || STRINGS.en[k] || k;
 }
-const state = {
+
+// ── STATE (localStorage persistence) ──
+function detectSystemTheme() {
+  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+    ? 'dark' : 'light';
+}
+var state = {
   lang:  localStorage.getItem('htf-lang')  || 'en',
-  theme: localStorage.getItem('htf-theme') || detectSystemTheme(),
+  theme: localStorage.getItem('htf-theme') || detectSystemTheme()
 };
 
 // ── THEME ──
 function applyTheme(theme) {
-  document.documentElement.dataset.theme = theme;
-  document.getElementById('btnTheme').textContent = theme === 'dark' ? '☀️' : '🌙';
+  document.documentElement.setAttribute('data-theme', theme);
+  var btn = document.getElementById('btnTheme');
+  if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
 }
 function toggleTheme() {
   state.theme = state.theme === 'light' ? 'dark' : 'light';
   localStorage.setItem('htf-theme', state.theme);
   applyTheme(state.theme);
+  renderDays(); // swap to the theme-matched map variant
 }
 
-// ── I18N ──
+// ── I18N — data-i18n attribute convention ──
 function applyI18n() {
   document.documentElement.lang = state.lang;
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.textContent = t(key);
-  });
-  document.getElementById('flagEn').classList.toggle('active', state.lang === 'en');
-  document.getElementById('flagFr').classList.toggle('active', state.lang === 'fr');
-  // Re-render day panels so day labels switch language
-  renderDays();
-  // Update footer generated date label language
-  renderGeneratedDate();
+  var nodes = document.querySelectorAll('[data-i18n]');
+  for (var i = 0; i < nodes.length; i++) {
+    nodes[i].textContent = t(nodes[i].getAttribute('data-i18n'));
+  }
+  var flagEn = document.getElementById('flagEn');
+  var flagFr = document.getElementById('flagFr');
+  if (flagEn) flagEn.className = state.lang === 'en' ? 'active' : '';
+  if (flagFr) flagFr.className = state.lang === 'fr' ? 'active' : '';
+  // Translate non-textContent bits (tab title, a11y labels, tooltips)
+  document.title = t('docTitle');
+  var ds = document.querySelector('.days-section'); if (ds) ds.setAttribute('aria-label', t('dayPanelsLabel'));
+  var bt = document.getElementById('btnTheme');     if (bt) bt.setAttribute('title', t('themeBtnTitle'));
+  var lt = document.querySelector('.lang-toggle');  if (lt) { lt.setAttribute('title', t('langBtnTitle')); lt.setAttribute('aria-label', t('langBtnTitle')); }
+  renderDays();           // day labels switch FR/EN
+  renderGeneratedDate();  // date locale switches
 }
 function toggleLang() {
   state.lang = state.lang === 'en' ? 'fr' : 'en';
@@ -507,73 +449,85 @@ function toggleLang() {
 }
 
 // ── IMAGE FALLBACK ──
-function onMapError(img, date) {
-  const wrap = img.closest('.day-map-wrap');
-  if (!wrap) return;
+function onMapError(img) {
   img.style.display = 'none';
-  const ph = wrap.querySelector('.map-placeholder');
+  var wrap = img.parentNode;
+  var ph = wrap ? wrap.querySelector('.map-placeholder') : null;
   if (ph) ph.style.display = 'flex';
 }
 
-// ── RENDER DAY PANELS ──
+// ── RENDER STAT VALUE ──
 function fmtStat(val, suffix) {
-  if (val === null || val === undefined) return '<span class="day-stat-value null-val">—</span>';
+  if (val === null || val === undefined) {
+    return '<span class="day-stat-value null-val">—</span>';
+  }
   return '<span class="day-stat-value">' + val + suffix + '</span>';
 }
 
+// ── RENDER DAY PANELS ──
 function renderDays() {
-  const container = document.getElementById('days');
-  container.innerHTML = DATA.map(day => {
-    const dayLabel = state.lang === 'fr' ? day.frDay : day.enDay;
-    const imgPath  = 'assets/maps/hotter_than_france_' + day.date + '.png';
-    return (
+  var container = document.getElementById('days');
+  if (!container) return;
+  var html = '';
+  for (var i = 0; i < DATA.length; i++) {
+    var day      = DATA[i];
+    var dayLabel = state.lang === 'fr' ? day.frDay : day.enDay;
+    // Theme-aware: a light and a dark variant per day; swapped on theme toggle.
+    var imgPath  = 'assets/maps/hotter_than_france_' + day.date + '_' + state.theme + '.png';
+    var pending  = t('mapPending');
+    html +=
       '<article class="day-card">' +
         '<div class="day-card-header">' +
           '<span class="day-label">' + dayLabel + '</span>' +
         '</div>' +
-        '<div class="day-map-wrap">' +
-          '<img src="' + imgPath + '" alt="' + dayLabel + '" loading="lazy"' +
-               ' onerror="onMapError(this,\'' + day.date + '\')">' +
-          '<div class="map-placeholder" aria-label="' + t('mapPending') + '">' +
-            '<span class="map-placeholder-icon" aria-hidden="true">&#127760;</span>' +
-            '<span>' + t('mapPending') + '</span>' +
+        '<figure class="day-figure">' +
+          '<div class="day-map-wrap">' +
+            '<img src="' + imgPath + '" alt="' + dayLabel + '" loading="lazy"' +
+                 ' onerror="onMapError(this)">' +
+            '<div class="map-placeholder" aria-label="' + pending + '">' +
+              '<span class="map-placeholder-icon" aria-hidden="true">&#127760;</span>' +
+              '<span>' + pending + '</span>' +
+            '</div>' +
           '</div>' +
-        '</div>' +
-        '<div class="day-stats">' +
-          '<div class="day-stat">' +
-            '<span class="day-stat-label">' + t('franceMax') + '</span>' +
-            fmtStat(day.franceMaxC !== null ? day.franceMaxC.toFixed(1) : null, '°C') +
-          '</div>' +
-          '<div class="day-stat">' +
-            '<span class="day-stat-label">' + t('planetHotter') + '</span>' +
-            fmtStat(day.planetPct !== null ? day.planetPct.toFixed(2) : null, '%') +
-          '</div>' +
-        '</div>' +
-      '</article>'
-    );
-  }).join('');
+          '<figcaption class="day-stats">' +
+            '<div class="day-stat">' +
+              '<span class="day-stat-label">' + t('franceMax') + '</span>' +
+              fmtStat(day.franceMaxC == null ? null : day.franceMaxC.toFixed(1), '°C') +
+            '</div>' +
+            '<div class="day-stat">' +
+              '<span class="day-stat-label">' + t('planetHotter') + '</span>' +
+              fmtStat(day.planetPct == null ? null : day.planetPct.toFixed(2), '%') +
+            '</div>' +
+          '</figcaption>' +
+        '</figure>' +
+      '</article>';
+  }
+  container.innerHTML = html;
 }
 
 // ── FOOTER DATE ──
 function renderGeneratedDate() {
-  const el = document.getElementById('generatedDate');
+  var el = document.getElementById('generatedDate');
   if (!el) return;
-  const d = new Date();
-  const opts = { year:'numeric', month:'long', day:'numeric' };
+  var d    = new Date();
+  var opts = { year: 'numeric', month: 'long', day: 'numeric' };
   el.textContent = d.toLocaleDateString(state.lang === 'fr' ? 'fr-FR' : 'en-GB', opts);
 }
 
 // ── INIT ──
 applyTheme(state.theme);
-applyI18n();  // also calls renderDays() and renderGeneratedDate()
+applyI18n(); // triggers renderDays() + renderGeneratedDate()
 
-// Honor system theme changes at runtime (when no stored preference)
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-  if (!localStorage.getItem('htf-theme')) {
-    state.theme = e.matches ? 'dark' : 'light';
-    applyTheme(state.theme);
-  }
-});
+// Honor system-theme changes at runtime (only when no stored preference)
+if (window.matchMedia) {
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+    if (!localStorage.getItem('htf-theme')) {
+      state.theme = e.matches ? 'dark' : 'light';
+      applyTheme(state.theme);
+      renderDays(); // swap to the theme-matched map variant
+    }
+  });
+}
 </script>
 </body>
 </html>
