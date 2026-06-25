@@ -247,6 +247,14 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
   display: flex; align-items: center; justify-content: center; margin-top: 1px;
 }
 
+/* ── ABOUT ECMWF / IFS ── */
+.about-section {
+  background: var(--method-bg); border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg); padding: 28px 28px 24px; margin-top: 20px;
+}
+.about-p { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.7; max-width: 760px; }
+.about-p + .about-p { margin-top: 14px; }
+
 /* ── FOOTER ── */
 .site-footer {
   position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
@@ -341,6 +349,13 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
     </ul>
   </section>
 
+  <!-- ABOUT ECMWF / IFS -->
+  <section class="about-section" aria-labelledby="aboutHeading">
+    <h2 class="method-title" id="aboutHeading" data-i18n="aboutTitle">ECMWF, the IFS, and open data</h2>
+    <p class="about-p" data-i18n="aboutP1">The European Centre for Medium-Range Weather Forecasts — ECMWF — is backed by some twenty European states, in the EU's orbit. It hosts several Copernicus services: climate, atmosphere, emergency response. They are what let us see a storm, a flood, a heatwave coming — and read climate change itself. The engine behind all of it is the IFS, a model that runs on a supercomputer and simulates the planet's atmosphere days ahead.</p>
+    <p class="about-p" data-i18n="aboutP2">An institution, a supercomputer, decades of research — you would expect those forecasts to stay with governments. Yet part of them is now open data, under an open licence. A researcher, a company, a journalist, a developer, an ordinary citizen can download them, recombine them, fold them into a service — commercial ones included — on the single condition of crediting the source. That is Europe's digital strategy in practice: open the data, and let innovation follow. This map was born from it.</p>
+  </section>
+
 </main>
 
 <!-- FOOTER -->
@@ -396,7 +411,10 @@ var STRINGS = {
     dayPanelsLabel:       "Daily panels",
     themeBtnTitle:        "Toggle dark mode",
     langBtnTitle:         "Switch language",
-    closeHint:            "Click anywhere to close"
+    closeHint:            "Click anywhere to close",
+    aboutTitle:           "ECMWF, the IFS, and open data",
+    aboutP1:              "The European Centre for Medium-Range Weather Forecasts — ECMWF — is backed by some twenty European states, in the EU's orbit. It hosts several Copernicus services: climate, atmosphere, emergency response. They are what let us see a storm, a flood, a heatwave coming — and read climate change itself. The engine behind all of it is the IFS, a model that runs on a supercomputer and simulates the planet's atmosphere days ahead.",
+    aboutP2:              "An institution, a supercomputer, decades of research — you would expect those forecasts to stay with governments. Yet part of them is now open data, under an open licence. A researcher, a company, a journalist, a developer, an ordinary citizen can download them, recombine them, fold them into a service — commercial ones included — on the single condition of crediting the source. That is Europe's digital strategy in practice: open the data, and let innovation follow. This map was born from it."
   },
   fr: {
     title:                "Plus chaud que la France",
@@ -418,7 +436,10 @@ var STRINGS = {
     dayPanelsLabel:       "Panneaux journaliers",
     themeBtnTitle:        "Basculer le mode sombre",
     langBtnTitle:         "Changer de langue",
-    closeHint:            "Cliquez n’importe où pour fermer"
+    closeHint:            "Cliquez n’importe où pour fermer",
+    aboutTitle:           "L’ECMWF, l’IFS et l’open data",
+    aboutP1:              "Le Centre européen pour les prévisions météorologiques à moyen terme — l’ECMWF — est porté par une vingtaine d’États européens, dans l’orbite de l’Union. Il héberge plusieurs services du programme Copernicus : climat, atmosphère, gestion des urgences. Ce sont eux qui permettent d’anticiper une tempête, une crue, une canicule — et de lire le changement climatique. Le moteur derrière tout cela s’appelle l’IFS : un modèle qui tourne sur un superordinateur et simule l’atmosphère du globe, plusieurs jours à l’avance.",
+    aboutP2:              "Une institution, un superordinateur, des décennies de recherche : on imaginerait ces prévisions réservées aux États. Or une partie est désormais en open data, sous licence ouverte. Un chercheur, une entreprise, un journaliste, un développeur, un simple citoyen peut les télécharger, les recombiner, les glisser dans un service — commercial compris — à la seule condition d’en citer l’origine. C’est la stratégie numérique européenne en actes : ouvrir la donnée pour que l’innovation suive. Cette carte en est née."
   }
 };
 
