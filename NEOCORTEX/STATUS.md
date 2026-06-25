@@ -8,11 +8,13 @@ Reproduce — and be able to regenerate — Ben Noll's WaPo "ECMWF-based" world 
 maps, calibrated against Noll's quoted planet-fraction figures (~1.2% / 0.93%).
 
 ## Current phase
-**Phases 1–3 COMPLETE + page shipped** — 2026-06-25. End-to-end works: loader → France mask → threshold →
-calibration (Mon 1.145% vs Noll 1.2% ✅) → 6 theme-aware Robinson maps → bilingual dark/light `site/index.html`
-with maps wired in. All stages independently verified; maps visually confirmed (deserts glow, France blank,
-hot area shrinks Mon→Wed). `CALIBRATION.md` written. Nested git repo committed.
-Remaining (optional): Phase 5 — ERA5 backfill (~29 Jun, when ERA5T covers 22–24 Jun) for a reanalysis cross-check.
+**Shipped + published** — 2026-06-25. Pipeline (loader → France mask → threshold → calibration 1.145% vs Noll
+1.2% ✅) → **12 maps** (3 days × light/dark × EN/FR): Robinson, France temperature-choropleth + outline +
+crosshair on its hottest cell, burnt-in localized title/date/stat. Bilingual dark/light `site/index.html`
+(latest featured full-width + 2 previous below, click-to-zoom lightbox, theme+lang map swap, MAP_B64 standalone
+fallback). `scripts/build_standalone.py` → single-file `site/hot-france-standalone.html`. Published to
+**github.com/pdewost/hot-france** (public) + Pages at **pdewost.github.io/hot-france**.
+Remaining (optional): Phase 5 — ERA5 backfill (~29 Jun; scheduled task `htf-era5-backfill`).
 
 ## Invariants
 1. **Data source = ECMWF IFS forecast (`oper`, param `mx2t3`), NOT ERA5** for these dates. ERA5/ERA5T

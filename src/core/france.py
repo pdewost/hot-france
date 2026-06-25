@@ -27,6 +27,53 @@ _METRO_LAT_MAX = 52.0
 _METRO_LON_MIN = -6.0
 _METRO_LON_MAX = 10.5
 
+# Module-level cache for the metropolitan France geometry
+_METRO_FRANCE_GEOM = None
+
+
+def metropolitan_france_geometry():
+    """Return the unioned shapely geometry of metropolitan France.
+
+    Uses the Natural Earth 10m admin_0_map_units layer (GEOUNIT=='France'),
+    intersected with the metropolitan bounding box so DOM territories are
+    excluded.
+
+    The result is cached module-level; subsequent calls are free.
+
+    Returns
+    -------
+    shapely geometry
+        Unioned (Multi)Polygon of metropolitan France incl. Corsica.
+    """
+    global _METRO_FRANCE_GEOM
+    if _METRO_FRANCE_GEOM is not None:
+        return _METRO_FRANCE_GEOM
+
+    import cartopy.io.shapereader as shpreader
+    from shapely.ops import unary_union
+    from shapely.geometry import box as shapely_box
+
+    shpfile = shpreader.natural_earth(
+        resolution='10m', category='cultural', name='admin_0_map_units'
+    )
+    reader = shpreader.Reader(shpfile)
+    france_geoms = [
+        r.geometry for r in reader.records()
+        if r.attributes.get('GEOUNIT', '') == 'France'
+    ]
+    if not france_geoms:
+        raise RuntimeError(
+            "No record with GEOUNIT='France' found in Natural Earth map_units."
+            " Check the shapefile or update the filter criterion."
+        )
+
+    # Intersect with metropolitan bbox to strip any overseas slivers
+    metro_bbox = shapely_box(_METRO_LON_MIN, _METRO_LAT_MIN, _METRO_LON_MAX, _METRO_LAT_MAX)
+    metro_geom = unary_union(france_geoms).intersection(metro_bbox)
+
+    _METRO_FRANCE_GEOM = metro_geom
+    return _METRO_FRANCE_GEOM
+
 
 def metropolitan_france_mask(da: xr.DataArray, verbose: bool = True) -> xr.DataArray:
     """Build a boolean mask for metropolitan France on the grid of *da*.
@@ -46,27 +93,12 @@ def metropolitan_france_mask(da: xr.DataArray, verbose: bool = True) -> xr.DataA
         Boolean DataArray with the same lat/lon coordinates as *da*.
         True = the cell centre is inside metropolitan France.
     """
-    import cartopy.io.shapereader as shpreader
     import shapely.vectorized as sv
-    from shapely.ops import unary_union
 
     # ------------------------------------------------------------------
-    # 1. Load and select the metropolitan France geometry
+    # 1. Load and select the metropolitan France geometry (cached)
     # ------------------------------------------------------------------
-    shpfile = shpreader.natural_earth(
-        resolution='10m', category='cultural', name='admin_0_map_units'
-    )
-    reader = shpreader.Reader(shpfile)
-    france_geoms = [
-        r.geometry for r in reader.records()
-        if r.attributes.get('GEOUNIT', '') == 'France'
-    ]
-    if not france_geoms:
-        raise RuntimeError(
-            "No record with GEOUNIT='France' found in Natural Earth map_units."
-            " Check the shapefile or update the filter criterion."
-        )
-    france_geom = unary_union(france_geoms)
+    france_geom = metropolitan_france_geometry()
 
     # ------------------------------------------------------------------
     # 2. Build coordinate arrays and bbox pre-filter

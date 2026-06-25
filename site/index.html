@@ -162,7 +162,8 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 }
 /* latest day featured full-width on top; the two previous sit side by side below */
 .day-card--featured { grid-column: 1 / -1; }
-.day-card--featured .day-label { font-size: 1.15rem; }
+/* featured map already burns in its title + date, so drop the duplicate HTML header */
+.day-card--featured .day-card-header { display: none; }
 .model-note {
   margin-top: 16px; font-size: 0.78rem; font-style: italic;
   color: var(--text-tertiary); line-height: 1.55; max-width: 760px;
@@ -492,8 +493,12 @@ function fmtStat(val, suffix) {
 // ── RENDER DAY PANELS ──
 function dayCardHtml(day, featured) {
   var dayLabel = state.lang === 'fr' ? day.frDay : day.enDay;
-  // Theme-aware: a light and a dark variant per day; swapped on theme toggle.
-  var imgPath  = 'assets/maps/hotter_than_france_' + day.date + '_' + state.theme + '.png';
+  // Theme- AND language-aware map; swapped on theme/lang toggle. Prefer an inlined
+  // base64 map (standalone single-file build) when present, else the assets/ path.
+  var mapKey   = day.date + '_' + state.theme + '_' + state.lang;
+  var imgPath  = (window.MAP_B64 && window.MAP_B64[mapKey])
+                 ? window.MAP_B64[mapKey]
+                 : 'assets/maps/hotter_than_france_' + mapKey + '.png';
   var pending  = t('mapPending');
   return (
     '<article class="day-card' + (featured ? ' day-card--featured' : '') + '">' +

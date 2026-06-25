@@ -3,6 +3,21 @@
 
 ---
 
+### 2026-06-25 | France choropleth + crosshair + burnt-in localized text; published to GitHub
+
+- Delegated render+verify (Sonnet@High, wf w7da6e5eb). PASS, calibration UNCHANGED (re-verified 41.53/42.10/42.04,
+  1033 cells). `france.py` gained `metropolitan_france_geometry()` (cached; mask refactored to reuse, behavior
+  preserved). `wapo_map.py`: France temp choropleth on one continuous norm (base=max(25,floor(france_min))→52,
+  YlOrRd) shared with the world overlay so they meet at France's max; France outline (add_geometries); crosshair
+  ('+'+ring, white w/ dark halo) at France's hottest cell (~Bordeaux/Landes 44.25N,0.75W); burnt-in localized
+  title/date/stat/credit (theme-coloured text bands; FR uses comma decimals). 12 maps (date×theme×lang); old 6 removed.
+- Visually confirmed (read PNGs): featured dark/EN + light/FR — France glows, crosshair correct, EN/FR text differs.
+- Page: image path now `<date>_<theme>_<lang>` + `window.MAP_B64` fallback (for the single-file build); featured
+  card's HTML header hidden (burnt date avoids dup).
+- **Published**: README/LICENSE/.nojekyll + `scripts/build_standalone.py` (inlines 12 maps → `hot-france-standalone.html`).
+  Public repo **github.com/pdewost/hot-france** (curated: page at root + maps + pipeline; NO NEOCORTEX/CLAUDE internals)
+  + GitHub Pages **pdewost.github.io/hot-france**. Founder chose public + curated.
+
 ### 2026-06-25 | Page layout v2 — featured latest + 2-up + click-to-zoom lightbox
 
 - Founder request: feature the latest day full-width with the two previous side by side below; click a
