@@ -1,0 +1,26 @@
+# Data & outputs (large binaries — regenerate, don't commit)
+data/*
+!data/.gitkeep
+outputs/*
+!outputs/.gitkeep
+snapshots/*
+!snapshots/.gitkeep
+*.nc
+*.grib
+*.grib2
+*.idx
+
+# Secrets
+.cdsapirc
+.env
+*.key
+
+# macOS junk
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
