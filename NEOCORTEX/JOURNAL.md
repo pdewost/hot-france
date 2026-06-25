@@ -3,6 +3,19 @@
 
 ---
 
+### 2026-06-25 | Presentation page built (Apple-50 template adapted)
+
+- Delegated adapt + verify (Sonnet@High, wf w1oxl0p64). Located template at
+  `Developpement/HTML single pages/apple-50-years-checklist.html`; reused its design tokens + dark/light +
+  i18n (STRINGS/t/toggleLang) + header/footer shell; dropped all checklist machinery.
+- `site/index.html` (self-contained): heat-gradient hero, record callout, 3 day panels (from DATA), 4-point
+  methodology, footer. Added: localStorage theme+lang persistence + prefers-color-scheme; data-i18n convention.
+- Founder edits (Opus): wired real Phase 2 numbers (Mon 41.5 °C/1.15% · Tue 42.1/0.77 · Wed 42.0/0.76);
+  added bilingual Tue/Wed model-vs-station-observation footnote (`modelNote`); object-fit contain (don't crop
+  world maps); consistent decimals; removed dead vars. Static check: 15/15 i18n parity, tags balanced.
+- Maps still pending → cards show graceful "Map pending"/"Carte à venir" until Phase 3 renders PNGs into
+  `site/assets/maps/`.
+
 ### 2026-06-25 | Phase 2 COMPLETE — calibration VALIDATED (1.145% vs Noll 1.2%)
 
 - Delegated build + independent adversarial verify (Sonnet@High, workflow wsoix6y8x). Verdict PASS, 0 bugs.

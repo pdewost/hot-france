@@ -31,7 +31,9 @@ Next: **Phase 3** (render WaPo-style maps) → **Phase 4** (wire real numbers + 
    Honest caption (source/variable/threshold/window). Reuse `metropolitan_france_mask` + `france_threshold`.
 2. **Phase 4** — copy chosen maps → `site/assets/maps/hotter_than_france_<date>.png`; wire the real numbers
    into the page DATA (Mon 41.53 °C/1.145% · Tue 42.10/0.767% · Wed 42.04/0.764%); write `outputs/CALIBRATION.md`.
-3. **Page** — `site/index.html` (Apple-50 template adapted, FR/EN + dark/light) building now (wf w1oxl0p64).
+3. **Page** ✅ — `site/index.html` (Apple-50 template adapted, FR/EN + dark/light, theme/lang persisted)
+   built + wired with real Phase 2 numbers + Tue/Wed model-vs-observation footnote. Maps pending (Phase 3)
+   show graceful "Map pending" placeholders. i18n 15/15 keys parity. Open in a browser to view.
 4. Phase 5 (optional, ~29 Jun+) — ERA5 backfill via corrected CDS; forecast-vs-reanalysis diff.
 
 ✅ Done 2026-06-25: scaffold; source-workflow challenge (verified); Phase 0 probe (ECMWF IFS, mx2t3);
