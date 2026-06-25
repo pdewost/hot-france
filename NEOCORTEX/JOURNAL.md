@@ -3,6 +3,16 @@
 
 ---
 
+### 2026-06-25 | Bottom-of-page ECMWF/IFS + open-data explainer (FR/EN, founder voice)
+
+- Added `.about-section` after methodology with bilingual `aboutTitle/aboutP1/aboutP2` (parity 23/23). Source
+  text massaged using style-guide **v2.1** (`07_Style_Profile/outputs/style_guide_dewost.md`): direct entry,
+  single retournement ("…stay with governments. Yet part is now open data" / "…réservées aux États. Or une
+  partie est désormais en open data"), punchline close ("This map was born from it." / "Cette carte en est
+  née."), native tech terms (open data, open licence), no consulting jargon, no colon-opposition.
+- Rebuilt standalone; committed working repo (1acf314); synced index.html + standalone to the curated publish
+  repo and pushed (origin 2d12611). Pages rebuilt & verified live (FR+EN strings present).
+
 ### 2026-06-25 | France choropleth + crosshair + burnt-in localized text; published to GitHub
 
 - Delegated render+verify (Sonnet@High, wf w7da6e5eb). PASS, calibration UNCHANGED (re-verified 41.53/42.10/42.04,
