@@ -103,6 +103,14 @@ def main():
               f'{ref["label_en"]} ({ref["frac_pct"]:.3f}%)')
         print(f'  Consider --target {ref["frac_pct"] + 0.05:.2f} to include it.')
 
+    # France comparison stats (always computed when France is not the editorial pick)
+    fra_stats = None
+    if ref['iso3'] != 'fra':
+        fra_stats = next((r for r in results if r['iso3'] == 'fra'), None)
+        if fra_stats:
+            print(f'  → France that day: {fra_stats["max_c"]:.2f} °C  '
+                  f'hotter={fra_stats["frac_pct"]:.3f}%')
+
     # ------------------------------------------------------------------
     # 3. Render 4 maps
     # ------------------------------------------------------------------
@@ -139,14 +147,18 @@ def main():
     r0 = render_results[0]  # any variant — stats are the same
 
     print(f'\n{"=" * 72}')
-    print('DATA entry to add to site/index.html:')
+    print('DATA entry to add to index.html:')
     print(f'{"─" * 72}')
+    fra_part = (
+        f" fraMaxC:{fra_stats['max_c']:.1f}, fraPct:{fra_stats['frac_pct']:.2f},"
+        if fra_stats else ''
+    )
     print(
         f"  {{date:'{date_str}', "
         f"enDay:'{en_day}', frDay:'{fr_day}', "
         f"refIso3:'{ref['iso3']}', "
         f"refEn:'{ref['label_en']}', refFr:'{ref['label_fr']}', "
-        f"refMaxC:{r0['threshold_c']}, "
+        f"refMaxC:{r0['threshold_c']},{fra_part} "
         f"planetPct:{round(ref['frac_pct'], 2)}}}"
     )
     print(f'{"─" * 72}')

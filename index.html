@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotter than France — June 2026 European Heatwave</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌡️</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
@@ -210,6 +211,8 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
   color: var(--heat); font-variant-numeric: tabular-nums; white-space: nowrap;
 }
 .day-stat-value.null-val { color: var(--text-tertiary); font-size: 1rem; }
+.day-stat--france { border-top: 1px solid var(--border-light); padding-top: 8px; margin-top: 2px; }
+.day-stat-value--france { font-size: 0.82rem; font-weight: 500; color: var(--text-secondary); white-space: normal; text-align: right; }
 
 /* ── LIGHTBOX (click a map → full page width; click again → close) ── */
 #lightbox {
@@ -387,8 +390,8 @@ var DATA = [
   {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:41.5, planetPct:1.15},
   {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.1, planetPct:0.77},
   {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.0, planetPct:0.76},
-  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  refMaxC:42.4, planetPct:0.68},
-  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  refMaxC:42.8, planetPct:0.69}
+  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  refMaxC:42.4, planetPct:0.68, fraMaxC:40.2, fraPct:1.70},
+  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  refMaxC:42.8, planetPct:0.69, fraMaxC:38.7, fraPct:2.34}
 ];
 
 // ── I18N ──
@@ -570,6 +573,16 @@ function dayCardHtml(day, featured) {
             '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + (day.refFr || 'la France') : 'Planet hotter than ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.planetPct == null ? null : day.planetPct.toFixed(2), '%') +
           '</div>' +
+          (day.refIso3 !== 'fra' && day.fraMaxC != null
+            ? '<div class="day-stat day-stat--france">' +
+                '<span class="day-stat-label">' + (state.lang === 'fr' ? 'France ce jour-là' : 'France that day') + '</span>' +
+                '<span class="day-stat-value day-stat-value--france">' +
+                  (state.lang === 'fr'
+                    ? day.fraMaxC.toFixed(1).replace('.', ',') + ' °C · ' + day.fraPct.toFixed(2).replace('.', ',') + ' % de la planète plus chaude'
+                    : day.fraMaxC.toFixed(1) + '°C · ' + day.fraPct.toFixed(2) + '% of the planet was hotter') +
+                '</span>' +
+              '</div>'
+            : '') +
         '</figcaption>' +
       '</figure>' +
     '</article>'

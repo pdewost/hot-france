@@ -69,7 +69,7 @@ def _date_label(date_str: str, lang: str) -> str:
 
 def _title_line(ref_label_en: str, ref_label_fr: str, lang: str) -> str:
     if lang == 'fr':
-        return f'Seuls les endroits plus chauds que {ref_label_fr}'
+        return f'Les seuls endroits plus chauds que {ref_label_fr}'
     return f'Only places hotter than {ref_label_en}'
 
 
@@ -264,6 +264,25 @@ def render_map(
             markersize=11, markeredgecolor='white', markeredgewidth=1.4,
             markerfacecolor='none', transform=ccrs.PlateCarree(),
             zorder=6, path_effects=[halo])
+
+    # ------------------------------------------------------------------
+    # 7b. France secondary overlay (when France is not the reference)
+    #     Shows France at its actual temperature colour — no crosshair, dashed outline.
+    # ------------------------------------------------------------------
+    if ref_iso3.upper() != 'FRA':
+        from src.core.france import metropolitan_france_mask, metropolitan_france_geometry
+        fra_mask  = metropolitan_france_mask(da, verbose=False)
+        fra_temps = da.where(fra_mask)
+        fra_cyclic, _ = add_cyclic_point(fra_temps.values, coord=lons_arr)
+        ax.pcolormesh(lon_cyclic, lats_arr, fra_cyclic,
+                      transform=ccrs.PlateCarree(), cmap=cmap_name, norm=norm,
+                      shading='auto', zorder=3)
+        fra_geom = metropolitan_france_geometry()
+        if fra_geom is not None and not fra_geom.is_empty:
+            fra_outline = '#F5A623' if theme == 'dark' else '#C07800'
+            ax.add_geometries([fra_geom], crs=ccrs.PlateCarree(),
+                              facecolor='none', edgecolor=fra_outline,
+                              linewidth=0.8, linestyle=(0, (4, 3)), zorder=5)
 
     # ------------------------------------------------------------------
     # 8. Burnt-in text
