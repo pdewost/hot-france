@@ -158,6 +158,7 @@ def main():
         f"enDay:'{en_day}', frDay:'{fr_day}', "
         f"refIso3:'{ref['iso3']}', "
         f"refEn:'{ref['label_en']}', refFr:'{ref['label_fr']}', "
+        f"iso2:'{ref['iso2']}', "
         f"refMaxC:{r0['threshold_c']},{fra_part} "
         f"planetPct:{round(ref['frac_pct'], 2)}}}"
     )

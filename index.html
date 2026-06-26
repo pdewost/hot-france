@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotter than France — June 2026 European Heatwave</title>
+<link rel="shortcut icon" href="favicon.ico">
 <link rel="icon" href="favicon.png" sizes="64x64">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -388,11 +389,11 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 // % of the globe strictly hotter than refMaxC. refIso3 = ISO3 lowercase = map filename prefix.
 // Editorial reference country auto-discovered daily (coolest country still below 0.8% threshold).
 var DATA = [
-  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:41.5, planetPct:1.15},
-  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.1, planetPct:0.77},
-  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.0, planetPct:0.76},
-  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  refMaxC:42.4, planetPct:0.68, fraMaxC:40.2, fraPct:1.70},
-  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  refMaxC:42.8, planetPct:0.69, fraMaxC:38.7, fraPct:2.34}
+  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:41.5, planetPct:1.15},
+  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.1, planetPct:0.77},
+  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.0, planetPct:0.76},
+  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  iso2:'LY', refMaxC:42.4, planetPct:0.68, fraMaxC:40.2, fraPct:1.70},
+  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  iso2:'MA', refMaxC:42.8, planetPct:0.69, fraMaxC:38.7, fraPct:2.34}
 ];
 
 // ── I18N ──
@@ -450,6 +451,13 @@ function t(k) {
 
 // ── DYNAMIC TITLE / TAGLINE (uses latest DATA entry's country) ──
 function _latestDay() { return DATA.length ? DATA[DATA.length - 1] : null; }
+
+function flagEmoji(iso2) {
+  if (!iso2) return '';
+  return [...iso2.toUpperCase()].map(function(c) {
+    return String.fromCodePoint(c.charCodeAt(0) + 127397);
+  }).join('');
+}
 
 function titleFor(lang) {
   var d = _latestDay();
@@ -567,16 +575,16 @@ function dayCardHtml(day, featured) {
         '</div>' +
         '<figcaption class="day-stats">' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Maximum ' + (day.refFr || 'France') : (day.refEn || 'France') + '’s hottest') + '</span>' +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Température maximale : ' + flagEmoji(day.iso2) + ' ' + (day.refFr || 'la France') : 'Max. temperature: ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.refMaxC == null ? (day.franceMaxC == null ? null : day.franceMaxC.toFixed(1)) : day.refMaxC.toFixed(1), '°C') +
           '</div>' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + (day.refFr || 'la France') : 'Planet hotter than ' + (day.refEn || 'France')) + '</span>' +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + flagEmoji(day.iso2) + ' ' + (day.refFr || 'la France') : 'Planet hotter than ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.planetPct == null ? null : day.planetPct.toFixed(2), '%') +
           '</div>' +
           (day.refIso3 !== 'fra' && day.fraMaxC != null
             ? '<div class="day-stat day-stat--france">' +
-                '<span class="day-stat-label">' + (state.lang === 'fr' ? 'France ce jour-là' : 'France that day') + '</span>' +
+                '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Température maximale : 🇫🇷 France' : 'Max. temperature: 🇫🇷 France') + '</span>' +
                 '<span class="day-stat-value day-stat-value--france">' +
                   (state.lang === 'fr'
                     ? day.fraMaxC.toFixed(1).replace('.', ',') + ' °C · ' + day.fraPct.toFixed(2).replace('.', ',') + ' % de la planète plus chaude'

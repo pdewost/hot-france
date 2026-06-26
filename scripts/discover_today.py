@@ -67,6 +67,14 @@ CANDIDATES = [
     ('Saudi Arabia', 'SAU', None,             None,     "l'Arabie Saoudite"),
 ]
 
+ISO3_TO_ISO2 = {
+    'FRA':'FR','ESP':'ES','PRT':'PT','ITA':'IT','GRC':'GR',
+    'DEU':'DE','AUT':'AT','CHE':'CH','HUN':'HU','ROU':'RO',
+    'GBR':'GB','TUR':'TR','BGR':'BG','SRB':'RS',
+    'MAR':'MA','DZA':'DZ','TUN':'TN','LBY':'LY','EGY':'EG',
+    'ISR':'IL','JOR':'JO','SAU':'SA',
+}
+
 
 def _build_mask(da, iso3, bbox, special):
     if special == 'france':
@@ -108,6 +116,7 @@ def discover(da, target_pct: float = 0.8, candidates=None):
                 'label_en': label_en,
                 'label_fr': label_fr,
                 'iso3':     iso3.lower(),
+                'iso2':     ISO3_TO_ISO2.get(iso3, ''),
                 'bbox':     bbox,
                 'special':  special,
                 'max_c':    country_max_c,
