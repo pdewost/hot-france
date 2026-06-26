@@ -459,6 +459,10 @@ function flagEmoji(iso2) {
   }).join('');
 }
 
+function bareFr(s) {
+  return s ? s.replace(/^(le |la |les |l')/, '') : s;
+}
+
 function titleFor(lang) {
   var d = _latestDay();
   if (!d) return lang === 'fr' ? 'Plus chaud que...' : 'Hotter than...';
@@ -575,11 +579,11 @@ function dayCardHtml(day, featured) {
         '</div>' +
         '<figcaption class="day-stats">' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Température maximale : ' + flagEmoji(day.iso2) + ' ' + (day.refFr || 'la France') : 'Max. temperature: ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Température maximale : ' + flagEmoji(day.iso2) + ' ' + bareFr(day.refFr || 'la France') : 'Max. temperature: ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.refMaxC == null ? (day.franceMaxC == null ? null : day.franceMaxC.toFixed(1)) : day.refMaxC.toFixed(1), '°C') +
           '</div>' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + flagEmoji(day.iso2) + ' ' + (day.refFr || 'la France') : 'Planet hotter than ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + flagEmoji(day.iso2) + ' ' + bareFr(day.refFr || 'la France') : 'Planet hotter than ' + flagEmoji(day.iso2) + ' ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.planetPct == null ? null : day.planetPct.toFixed(2), '%') +
           '</div>' +
           (day.refIso3 !== 'fra' && day.fraMaxC != null

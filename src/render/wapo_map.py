@@ -67,6 +67,12 @@ def _date_label(date_str: str, lang: str) -> str:
     return f"{_DAYS_EN[d.weekday()]} {d.day} {_MONTHS_EN[d.month - 1]} {d.year}"
 
 
+def _bare_fr(s: str) -> str:
+    """Strip French definite article: 'le Maroc' → 'Maroc'."""
+    import re
+    return re.sub(r'^(le |la |les |l\')', '', s)
+
+
 def _title_line(ref_label_en: str, ref_label_fr: str, lang: str) -> str:
     if lang == 'fr':
         return f'Les seuls endroits plus chauds que {ref_label_fr}'
@@ -80,7 +86,7 @@ def _stat_line(thr: float, pct: float, lang: str,
     if lang == 'fr':
         T = T.replace('.', ',')
         P = P.replace('.', ',')
-        return f'Maximum {ref_label_fr} {T} °C  ·  {P} % de la planète plus chaude'
+        return f'Température maximale : {_bare_fr(ref_label_fr)} {T} °C  ·  {P} % de la planète plus chaude'
     return f"{ref_label_en}'s hottest {T}°C  ·  {P}% of the planet was hotter"
 
 
@@ -98,6 +104,7 @@ def render_map(
     ref_bbox: tuple | None = None,
     ref_label_en: str = 'France',
     ref_label_fr: str = 'la France',
+    ref_flag: str = '',
 ) -> dict:
     """Render a single WaPo-style world map and save it as PNG.
 
@@ -265,6 +272,12 @@ def render_map(
             markerfacecolor='none', transform=ccrs.PlateCarree(),
             zorder=6, path_effects=[halo])
 
+    # Flag emoji — placed to the left of the crosshair
+    if ref_flag:
+        ax.text(crosshair_lon, crosshair_lat, ref_flag,
+                transform=ccrs.PlateCarree(),
+                fontsize=16, ha='right', va='center', zorder=7, clip_on=True)
+
     # ------------------------------------------------------------------
     # 7b. France secondary overlay (when France is not the reference)
     #     Shows France at its actual temperature colour — no crosshair, dashed outline.
@@ -283,6 +296,10 @@ def render_map(
             ax.add_geometries([fra_geom], crs=ccrs.PlateCarree(),
                               facecolor='none', edgecolor=fra_outline,
                               linewidth=0.8, linestyle=(0, (4, 3)), zorder=5)
+            c = fra_geom.centroid
+            ax.text(c.x, c.y, '🇫🇷',
+                    transform=ccrs.PlateCarree(),
+                    fontsize=12, ha='center', va='center', zorder=7, clip_on=True)
 
     # ------------------------------------------------------------------
     # 8. Burnt-in text

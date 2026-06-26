@@ -35,6 +35,10 @@ from scripts.discover_today import discover, CANDIDATES  # noqa: E402
 _OUTPUTS_DIR   = _PROJECT_ROOT / 'outputs'
 _SITE_MAPS_DIR = _PROJECT_ROOT / 'assets' / 'maps'
 
+def _flag_emoji(iso2: str) -> str:
+    if not iso2: return ''
+    return ''.join(chr(ord(c) + 127397) for c in iso2.upper())
+
 THEMES = ['dark', 'light']
 LANGS  = ['en', 'fr']
 
@@ -133,6 +137,7 @@ def main():
                 ref_bbox=ref['bbox'],
                 ref_label_en=ref['label_en'],
                 ref_label_fr=ref['label_fr'],
+                ref_flag=_flag_emoji(ref.get('iso2', '')),
             )
             shutil.copy2(str(out1), str(out2))
             render_results.append({**ref, **info, 'theme': theme, 'lang': lang})
