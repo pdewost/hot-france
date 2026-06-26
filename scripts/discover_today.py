@@ -38,36 +38,37 @@ from src.core.threshold import planet_fraction_hotter
 # label_fr includes the definite article (used in map burnt-in text)
 # ---------------------------------------------------------------------------
 CANDIDATES = [
-    # Europe west / south
-    ('France',       'FRA', None,             'france', 'la France'),
-    ('Spain',        'ESP', (-10,35, 5,45),   None,     "l'Espagne"),
-    ('Portugal',     'PRT', (-10,36,-6,42),   None,     'le Portugal'),
-    ('Italy',        'ITA', (  6,36,19,48),   None,     "l'Italie"),
-    ('Greece',       'GRC', ( 19,34,30,42),   None,     'la Grèce'),
-    # Europe central / north
-    ('Germany',      'DEU', None,             None,     "l'Allemagne"),
-    ('Austria',      'AUT', None,             None,     "l'Autriche"),
-    ('Switzerland',  'CHE', None,             None,     'la Suisse'),
-    ('Hungary',      'HUN', None,             None,     'la Hongrie'),
-    ('Romania',      'ROU', None,             None,     'la Roumanie'),
-    ('UK',           'GBR', ( -8,49, 2,62),   None,     'le Royaume-Uni'),
-    # Balkans / eastern Med
-    ('Turkey',       'TUR', ( 25,35,45,43),   None,     'la Turquie'),
-    ('Bulgaria',     'BGR', None,             None,     'la Bulgarie'),
-    ('Serbia',       'SRB', None,             None,     'la Serbie'),
-    # North Africa
-    ('Morocco',      'MAR', None,             None,     'le Maroc'),
-    ('Algeria',      'DZA', None,             None,     "l'Algérie"),
-    ('Tunisia',      'TUN', None,             None,     'la Tunisie'),
-    ('Libya',        'LBY', None,             None,     'la Libye'),
-    ('Egypt',        'EGY', None,             None,     "l'Égypte"),
-    # Middle East
-    ('Israel',       'ISR', None,             None,     'Israël'),
-    ('Jordan',       'JOR', None,             None,     'la Jordanie'),
-    ('Saudi Arabia', 'SAU', None,             None,     "l'Arabie Saoudite"),
-    # South Asia
-    ('India',        'IND', (68,  6, 97, 36), None,     "l'Inde"),
-    ('Pakistan',     'PAK', (60, 23, 78, 37), None,     'le Pakistan'),
+    # ── Continental Europe + UK (scope='europe') — eligible as daily map reference ──
+    ('France',       'FRA', None,             'france', 'la France',               'europe'),
+    ('Spain',        'ESP', (-10,35, 5,45),   None,     "l'Espagne",               'europe'),
+    ('Portugal',     'PRT', (-10,36,-6,42),   None,     'le Portugal',             'europe'),
+    ('Italy',        'ITA', (  6,36,19,48),   None,     "l'Italie",                'europe'),
+    ('Greece',       'GRC', ( 19,34,30,42),   None,     'la Grèce',                'europe'),
+    ('Germany',      'DEU', None,             None,     "l'Allemagne",             'europe'),
+    ('Austria',      'AUT', None,             None,     "l'Autriche",              'europe'),
+    ('Switzerland',  'CHE', None,             None,     'la Suisse',               'europe'),
+    ('Hungary',      'HUN', None,             None,     'la Hongrie',              'europe'),
+    ('Romania',      'ROU', None,             None,     'la Roumanie',             'europe'),
+    ('UK',           'GBR', ( -8,49, 2,62),   None,     'le Royaume-Uni',          'europe'),
+    ('Bulgaria',     'BGR', None,             None,     'la Bulgarie',             'europe'),
+    ('Serbia',       'SRB', None,             None,     'la Serbie',               'europe'),
+    # ── Global context (scope='global') — appear on map as hot cells; never map reference ──
+    ('Turkey',       'TUR', ( 25,35,45,43),   None,     'la Turquie',              'global'),
+    ('Morocco',      'MAR', None,             None,     'le Maroc',                'global'),
+    ('Algeria',      'DZA', None,             None,     "l'Algérie",               'global'),
+    ('Tunisia',      'TUN', None,             None,     'la Tunisie',              'global'),
+    ('Libya',        'LBY', None,             None,     'la Libye',                'global'),
+    ('Egypt',        'EGY', None,             None,     "l'Égypte",                'global'),
+    ('Israel',       'ISR', None,             None,     'Israël',                  'global'),
+    ('Jordan',       'JOR', None,             None,     'la Jordanie',             'global'),
+    ('Saudi Arabia', 'SAU', None,             None,     "l'Arabie Saoudite",       'global'),
+    ('Iraq',         'IRQ', (38, 29, 49, 38), None,     "l'Irak",                  'global'),
+    ('Kuwait',       'KWT', None,             None,     'le Koweït',               'global'),
+    ('UAE',          'ARE', (51, 22, 57, 26), None,     'les Émirats arabes unis', 'global'),
+    ('Iran',         'IRN', None,             None,     "l'Iran",                  'global'),
+    ('Mauritania',   'MRT', None,             None,     'la Mauritanie',           'global'),
+    ('India',        'IND', (68,  6, 97, 36), None,     "l'Inde",                  'global'),
+    ('Pakistan',     'PAK', (60, 23, 78, 37), None,     'le Pakistan',             'global'),
 ]
 
 ISO3_TO_ISO2 = {
@@ -76,6 +77,8 @@ ISO3_TO_ISO2 = {
     'GBR':'GB','TUR':'TR','BGR':'BG','SRB':'RS',
     'MAR':'MA','DZA':'DZ','TUN':'TN','LBY':'LY','EGY':'EG',
     'ISR':'IL','JOR':'JO','SAU':'SA',
+    'IRQ':'IQ','KWT':'KW','ARE':'AE','IRN':'IR',
+    'MRT':'MR',
     'IND':'IN','PAK':'PK',
 }
 
@@ -94,21 +97,22 @@ def discover(da, target_pct: float = 0.8, candidates=None):
     da : xr.DataArray
         Normalized daily-max temperature grid (°C, lat/lon).
     target_pct : float
-        Planet-fraction threshold in percent (default 0.8).
+        Planet-fraction threshold in percent (default 0.8 — kept for display only).
     candidates : list or None
         Override CANDIDATES list; defaults to module-level CANDIDATES.
 
     Returns
     -------
-    results  : list of dicts (sorted ascending by frac_pct)
-    extreme  : dict — hottest candidate (smallest fraction)
-    editorial: dict — most relatable candidate (largest fraction still below target)
+    results    : list of dicts (sorted ascending by frac_pct)
+    extreme    : dict — globally hottest candidate (smallest fraction overall)
+    editorial  : dict — most relatable candidate still below target_pct (legacy)
+    europe_ref : dict — hottest Continental European country (map reference)
     """
     if candidates is None:
         candidates = CANDIDATES
 
     results = []
-    for label_en, iso3, bbox, special, label_fr in candidates:
+    for label_en, iso3, bbox, special, label_fr, scope in candidates:
         try:
             mask    = _build_mask(da, iso3, bbox, special)
             n_cells = int(mask.values.sum())
@@ -123,6 +127,7 @@ def discover(da, target_pct: float = 0.8, candidates=None):
                 'iso2':     ISO3_TO_ISO2.get(iso3, ''),
                 'bbox':     bbox,
                 'special':  special,
+                'scope':    scope,
                 'max_c':    country_max_c,
                 'frac_pct': frac_pct,
                 'n_cells':  n_cells,
@@ -135,7 +140,12 @@ def discover(da, target_pct: float = 0.8, candidates=None):
     passing  = [r for r in results if r['passes']]
     extreme  = passing[0]  if passing else None
     editorial = passing[-1] if passing else None
-    return results, extreme, editorial
+
+    # EU-scoped reference: hottest European country, no threshold
+    eu_results = [r for r in results if r['scope'] == 'europe']
+    europe_ref = eu_results[0] if eu_results else None  # already sorted ascending by frac_pct
+
+    return results, extreme, editorial, europe_ref
 
 
 def main():
@@ -162,7 +172,7 @@ def main():
     print(f'[load] Grid: {dict(da.sizes)}\n')
 
     # Print progress line-by-line while running the ranking
-    for label_en, iso3, bbox, special, label_fr in CANDIDATES:
+    for label_en, iso3, bbox, special, label_fr, scope in CANDIDATES:
         try:
             mask    = _build_mask(da, iso3, bbox, special)
             n_cells = int(mask.values.sum())
@@ -179,7 +189,7 @@ def main():
             print(f'  [!] {label_en:<16} ERROR: {e}')
 
     # Full structured run via discover()
-    results, extreme, editorial = discover(da, target_pct)
+    results, extreme, editorial, europe_ref = discover(da, target_pct)
 
     if not results:
         print('\nNo results — check GRIB download and shapefile cache.')
@@ -216,25 +226,24 @@ def main():
     if passing:
         print(f'\n  {len(passing)} candidate(s) pass the < {target_pct:.1f}% filter.')
         if editorial is not extreme:
-            print(f'\nExtreme   →  {extreme["label_en"]} ({extreme["iso3"].upper()})')
+            print(f'\nExtreme (global)  →  {extreme["label_en"]} ({extreme["iso3"].upper()})')
             print(f'  Max: {extreme["max_c"]:.2f} °C  |  Planet hotter: {extreme["frac_pct"]:.3f}%')
-            print(f'  (hottest of all candidates — least of the planet beats it)')
-            print(f'\nEditorial →  {editorial["label_en"]} ({editorial["iso3"].upper()})')
+            print(f'\nEditorial (legacy)→  {editorial["label_en"]} ({editorial["iso3"].upper()})')
             print(f'  Max: {editorial["max_c"]:.2f} °C  |  Planet hotter: {editorial["frac_pct"]:.3f}%')
-            print(f'  (most relatable country still below the {target_pct:.1f}% threshold)')
-            print(f'  → "{editorial["frac_pct"]:.2f}% of the globe is strictly hotter '
-                  f'than {editorial["label_en"]}\'s hottest point today."')
         else:
-            print(f'\nWinner  →  {editorial["label_en"]} ({editorial["iso3"].upper()})')
-            print(f'  Max: {editorial["max_c"]:.2f} °C  |  Planet hotter: {editorial["frac_pct"]:.3f}%')
+            print(f'\nExtreme (global)  →  {extreme["label_en"]} ({extreme["iso3"].upper()})')
+            print(f'  Max: {extreme["max_c"]:.2f} °C  |  Planet hotter: {extreme["frac_pct"]:.3f}%')
     else:
-        closest = results[0]
-        print(f'\n  No candidate passes < {target_pct:.1f}% today.')
-        print(f'  Closest: {closest["label_en"]} at {closest["frac_pct"]:.3f}%.')
-        print(f'  Try --target {closest["frac_pct"]:.2f} to capture it.')
+        print(f'\n  No global candidate passes < {target_pct:.1f}% today.')
+
+    if europe_ref:
+        print(f'\nEurope ref (MAP)  →  {europe_ref["label_en"]} ({europe_ref["iso3"].upper()})')
+        print(f'  Max: {europe_ref["max_c"]:.2f} °C  |  Planet hotter: {europe_ref["frac_pct"]:.3f}%')
+        print(f'  → "{europe_ref["frac_pct"]:.2f}% of Earth is strictly hotter than '
+              f'{europe_ref["label_en"]}\'s hottest point today."')
 
     print(f'\n{"=" * 72}')
-    return results, editorial  # (results sorted asc, editorial = most-relatable passer)
+    return results, europe_ref  # europe_ref = actual map reference
 
 
 if __name__ == '__main__':

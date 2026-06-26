@@ -86,26 +86,22 @@ def main():
     # ------------------------------------------------------------------
     # 2. Discover editorial country
     # ------------------------------------------------------------------
-    print(f'\n[2/3] Discovering reference country (target < {target_pct:.1f}%) ...')
-    results, extreme, editorial = discover(da, target_pct, CANDIDATES)
+    print(f'\n[2/3] Discovering reference country (EU-scoped) ...')
+    results, extreme, editorial, europe_ref = discover(da, target_pct, CANDIDATES)
 
     if not results:
         print('  ERROR: discovery returned no results. Check GRIB + shapefiles.')
         sys.exit(1)
 
-    passing = [r for r in results if r['passes']]
-    print(f'  {len(passing)} candidate(s) pass < {target_pct:.1f}%')
-
-    if editorial:
-        ref = editorial
-        print(f'  → Editorial: {ref["label_en"]} ({ref["iso3"].upper()})  '
+    if europe_ref:
+        ref = europe_ref
+        print(f'  → Europe ref: {ref["label_en"]} ({ref["iso3"].upper()})  '
               f'max={ref["max_c"]:.2f} °C  hotter={ref["frac_pct"]:.3f}%')
     else:
-        # Fallback: use the closest candidate
+        # Fallback: should never happen if CANDIDATES includes Europe
         ref = results[0]
-        print(f'  ⚠ No candidate passes {target_pct:.1f}%. Using closest: '
+        print(f'  ⚠ No European candidate found. Falling back to: '
               f'{ref["label_en"]} ({ref["frac_pct"]:.3f}%)')
-        print(f'  Consider --target {ref["frac_pct"] + 0.05:.2f} to include it.')
 
     # France comparison stats (always computed when France is not the editorial pick)
     fra_stats = None

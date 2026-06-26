@@ -73,6 +73,67 @@ def _bare_fr(s: str) -> str:
     return re.sub(r'^(le |la |les |l\')', '', s)
 
 
+# ---------------------------------------------------------------------------
+# Flag overlay helpers (Twemoji PNG — reliable on all platforms)
+# ---------------------------------------------------------------------------
+_FLAGS_DIR = Path(__file__).resolve().parent.parent.parent / 'assets' / 'flags'
+
+
+def _iso2_from_flag_emoji(emoji: str) -> str:
+    """'🇲🇦' → 'MA'"""
+    return ''.join(chr(ord(c) - 127397) for c in emoji if ord(c) > 127397)
+
+
+def _twemoji_code(iso2: str) -> str:
+    """'MA' → '1f1f2-1f1e6'"""
+    return '-'.join(f'{ord(c) + 127397:05x}' for c in iso2.upper())
+
+
+def _get_flag_image(iso2: str, size: int = 40):
+    """Return a PIL RGBA Image of the flag, downloaded from Twemoji (cached in assets/flags/)."""
+    from PIL import Image
+    import urllib.request
+    if not iso2:
+        return None
+    _FLAGS_DIR.mkdir(parents=True, exist_ok=True)
+    cache = _FLAGS_DIR / f'{iso2.upper()}.png'
+    if not cache.exists():
+        url = (f'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2'
+               f'/assets/72x72/{_twemoji_code(iso2)}.png')
+        try:
+            import subprocess
+            r = subprocess.run(['curl', '-s', '-o', str(cache), url],
+                               timeout=15, capture_output=True)
+            if r.returncode != 0 or not cache.exists():
+                return None
+        except Exception:
+            return None
+    try:
+        img = Image.open(cache).convert('RGBA')
+        return img.resize((size, size), Image.LANCZOS)
+    except Exception:
+        return None
+
+
+def _country_topleft(iso3: str, bbox=None):
+    """Return (lon, lat) of the NW corner of the country bounding box.
+    Placing the flag's bottom-right at this point puts the flag outside upper-left."""
+    if bbox:
+        return bbox[0], bbox[3]  # lon_min, lat_max
+    try:
+        import cartopy.io.shapereader as shpreader
+        from shapely.geometry import shape as shp_shape
+        shpfile = shpreader.natural_earth(
+            resolution='110m', category='cultural', name='admin_0_countries')
+        for rec in shpreader.Reader(shpfile).records():
+            if rec.attributes.get('ADM0_A3', '') == iso3.upper():
+                b = shp_shape(rec.geometry).bounds  # (minx, miny, maxx, maxy)
+                return b[0], b[3]  # lon_min, lat_max = NW corner
+    except Exception:
+        pass
+    return None, None
+
+
 def _title_line(ref_label_en: str, ref_label_fr: str, lang: str) -> str:
     if lang == 'fr':
         return f'Les seuls endroits plus chauds que {ref_label_fr}'
@@ -272,10 +333,17 @@ def render_map(
             markerfacecolor='none', transform=ccrs.PlateCarree(),
             zorder=6, path_effects=[halo])
 
-    # Collect emoji overlay positions (geo coords → resolved to pixels before savefig)
-    _emoji_geo = []  # [(lon, lat, emoji, ha)]
+    # Collect emoji overlay positions — NW corner of country polygon (flag appears outside, upper-left)
+    _emoji_geo = []  # [(lon, lat, emoji)]
     if ref_flag:
-        _emoji_geo.append((crosshair_lon, crosshair_lat, ref_flag, 'right'))
+        if ref_geom is not None and not ref_geom.is_empty:
+            rb = ref_geom.bounds  # (minx, miny, maxx, maxy)
+            flag_lon, flag_lat = rb[0], rb[3]
+        else:
+            flag_lon, flag_lat = _country_topleft(ref_iso3, ref_bbox)
+            if flag_lon is None:
+                flag_lon, flag_lat = crosshair_lon, crosshair_lat
+        _emoji_geo.append((flag_lon, flag_lat, ref_flag))
 
     # ------------------------------------------------------------------
     # 7b. France secondary overlay (when France is not the reference)
@@ -295,8 +363,8 @@ def render_map(
             ax.add_geometries([fra_geom], crs=ccrs.PlateCarree(),
                               facecolor='none', edgecolor=fra_outline,
                               linewidth=0.8, linestyle=(0, (4, 3)), zorder=5)
-            c = fra_geom.centroid
-            _emoji_geo.append((c.x, c.y, '🇫🇷', 'center'))
+            fb = fra_geom.bounds  # (minx, miny, maxx, maxy)
+            _emoji_geo.append((fb[0], fb[3], '🇫🇷'))  # NW corner of France
 
     # ------------------------------------------------------------------
     # 8. Burnt-in text
@@ -330,33 +398,36 @@ def render_map(
         ax_l, ax_r = bb.x0 * fw, bb.x1 * fw
         ax_t, ax_b = (1 - bb.y1) * fh, (1 - bb.y0) * fh  # PIL top-down
         xlim, ylim = ax.get_xlim(), ax.get_ylim()
-        for lon_, lat_, emoji_, ha_ in _emoji_geo:
+        for lon_, lat_, emoji_ in _emoji_geo:
             rx, ry = ccrs.Robinson().transform_point(lon_, lat_, ccrs.PlateCarree())
             px_ = ax_l + (rx - xlim[0]) / (xlim[1] - xlim[0]) * (ax_r - ax_l)
             py_ = ax_t + (1 - (ry - ylim[0]) / (ylim[1] - ylim[0])) * (ax_b - ax_t)
-            _emoji_px.append((int(px_), int(py_), emoji_, ha_))
+            _emoji_px.append((int(px_), int(py_), emoji_))
 
     plt.savefig(str(out_path), facecolor=tc['bg'], dpi=125, bbox_inches=None)
     plt.close(fig)
 
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image
     img = Image.open(out_path).convert('RGBA')
     w, h = img.size
 
     if _emoji_px:
-        _EMOJI_FONT = '/System/Library/Fonts/Apple Color Emoji.ttc'
-        try:
-            efont = ImageFont.truetype(_EMOJI_FONT, size=30)
-            drw   = ImageDraw.Draw(img)
-            for px_, py_, emoji_, ha_ in _emoji_px:
-                bb_ = drw.textbbox((0, 0), emoji_, font=efont, embedded_color=True)
-                ew_, eh_ = bb_[2] - bb_[0], bb_[3] - bb_[1]
-                tx = (px_ - ew_ - 5) if ha_ == 'right' else (px_ - ew_ // 2)
-                ty = py_ - eh_ // 2
-                drw.text((tx, ty), emoji_, font=efont, embedded_color=True)
-            img.save(out_path)
-        except (OSError, IOError, AttributeError):
-            pass  # Emoji font unavailable — silently skip overlay
+        from PIL import ImageDraw
+        for px_, py_, emoji_ in _emoji_px:
+            iso2_ = _iso2_from_flag_emoji(emoji_)
+            flag  = _get_flag_image(iso2_, size=40)
+            if flag is None:
+                continue
+            fw_, fh_ = flag.size
+            pad = 3
+            # Flag's bottom-right at (px_, py_) = NW corner of polygon → flag is outside, upper-left
+            tx = max(pad, min(w - fw_ - pad, px_ - fw_))
+            ty = max(pad, min(h - fh_ - pad, py_ - fh_))
+            # White card behind flag so it's visible over any heat colour
+            card = Image.new('RGBA', (fw_ + 2*pad, fh_ + 2*pad), (255, 255, 255, 210))
+            img.paste(card, (tx - pad, ty - pad), card)
+            img.paste(flag, (tx, ty), flag)
+        img.save(out_path)
 
     n_hot_cells   = int((~world_hot.isnull()).sum())
     hot_cell_pct  = 100.0 * n_hot_cells / world_hot.size

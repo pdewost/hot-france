@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hotter than France — June 2026 European Heatwave</title>
-<link rel="shortcut icon" href="favicon.ico">
-<link rel="icon" href="favicon.png" sizes="64x64">
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=3">
+<link rel="shortcut icon" href="favicon.ico?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
@@ -387,13 +387,14 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 // ── DATA ──
 // Per-day = hottest 0.25° ECMWF IFS grid cell (00 UTC run); planetPct = cos-lat area-weighted
 // % of the globe strictly hotter than refMaxC. refIso3 = ISO3 lowercase = map filename prefix.
-// Editorial reference country auto-discovered daily (coolest country still below 0.8% threshold).
+// Reference country = hottest Continental European country that day (no threshold).
+// France appears as secondary overlay when it is not the hottest European country.
 var DATA = [
-  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'egy', refEn:'Egypt',   refFr:'l\'Égypte', iso2:'EG', refMaxC:42.78, fraMaxC:41.5, fraPct:1.14, planetPct:0.68},
-  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.1, planetPct:0.77},
-  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.0, planetPct:0.76},
-  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  iso2:'LY', refMaxC:42.4, planetPct:0.68, fraMaxC:40.2, fraPct:1.70},
-  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  iso2:'MA', refMaxC:42.8, planetPct:0.69, fraMaxC:38.7, fraPct:2.34}
+  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'esp', refEn:'Spain',   refFr:"l'Espagne", iso2:'ES', refMaxC:42.31, fraMaxC:41.5,  fraPct:1.14, planetPct:0.84},
+  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'esp', refEn:'Spain',   refFr:"l'Espagne", iso2:'ES', refMaxC:43.85, fraMaxC:42.1,  fraPct:0.77, planetPct:0.34},
+  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.04, planetPct:0.76},
+  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:40.15, planetPct:1.70},
+  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'deu', refEn:'Germany', refFr:"l'Allemagne", iso2:'DE', refMaxC:38.86, fraMaxC:38.65, fraPct:2.34, planetPct:2.26}
 ];
 
 // ── I18N ──
@@ -407,8 +408,8 @@ var STRINGS = {
     modelNote:            "Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official “record broken” figures are station observations — a separate measure.",
     methodTitle:          "How this was made",
     methodData:           "Global 2-metre maximum temperature from ECMWF’s IFS operational forecast (0.25°) — the same model family The Washington Post used.",
-    methodThreshold:      "“Hotter than France” means hotter than the single hottest grid cell in metropolitan France that day.",
-    methodFraction:       "The percentage is the cosine-latitude area-weighted share of the globe exceeding that threshold.",
+    methodThreshold:      “Each day we find the hottest Continental European country and draw the map around it. On days when France is not the hottest, it appears as a secondary overlay — always visible for reference.”,
+    methodFraction:       “The percentage is the cosine-latitude area-weighted share of the globe strictly hotter than that country's peak grid cell.”,
     methodCredit:         "Inspired by Ben Noll (The Washington Post). This is an independent reconstruction — not the original graphic.",
     footerData:           "Data: ECMWF IFS · Independent reconstruction, not affiliated with The Washington Post",
     footerDataLabel:      "Data",
@@ -429,8 +430,8 @@ var STRINGS = {
     modelNote:            "Les valeurs quotidiennes correspondent à la cellule de grille la plus chaude du modèle (0,25°, IFS CEPMMT, run 00 UTC). À cette résolution, mardi et mercredi sont quasi à égalité (~42 °C) ; les records officiels « battus » sont des relevés de stations — une mesure distincte.",
     methodTitle:          "Méthode",
     methodData:           "Température maximale à 2 mètres, monde entier, issue de la prévision opérationnelle IFS du CEPMMT (0,25°) — la même famille de modèles que celle utilisée par le Washington Post.",
-    methodThreshold:      "« Plus chaud que la France » signifie plus chaud que la cellule la plus chaude de France métropolitaine ce jour-là.",
-    methodFraction:       "Le pourcentage correspond à la part de la surface du globe dépassant ce seuil, pondérée par la surface (cosinus de la latitude).",
+    methodThreshold:      "Chaque jour, nous identifions le pays européen continental le plus chaud et construisons la carte autour de lui. Quand la France n’est pas la plus chaude, elle apparaît en superposition secondaire — toujours visible pour référence.",
+    methodFraction:       "Le pourcentage correspond à la part de la surface du globe strictement plus chaude que le point culminant de ce pays, pondérée par la surface (cosinus de la latitude).",
     methodCredit:         "Inspiré de Ben Noll (The Washington Post). Reconstruction indépendante — il ne s’agit pas du graphique original.",
     footerData:           "Données : IFS CEPMMT · Reconstruction indépendante, sans affiliation avec le Washington Post",
     footerDataLabel:      "Données",
