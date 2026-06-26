@@ -65,6 +65,9 @@ CANDIDATES = [
     ('Israel',       'ISR', None,             None,     'Israël'),
     ('Jordan',       'JOR', None,             None,     'la Jordanie'),
     ('Saudi Arabia', 'SAU', None,             None,     "l'Arabie Saoudite"),
+    # South Asia
+    ('India',        'IND', (68,  6, 97, 36), None,     "l'Inde"),
+    ('Pakistan',     'PAK', (60, 23, 78, 37), None,     'le Pakistan'),
 ]
 
 ISO3_TO_ISO2 = {
@@ -73,6 +76,7 @@ ISO3_TO_ISO2 = {
     'GBR':'GB','TUR':'TR','BGR':'BG','SRB':'RS',
     'MAR':'MA','DZA':'DZ','TUN':'TN','LBY':'LY','EGY':'EG',
     'ISR':'IL','JOR':'JO','SAU':'SA',
+    'IND':'IN','PAK':'PK',
 }
 
 

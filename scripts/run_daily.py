@@ -158,11 +158,12 @@ def main():
         f" fraMaxC:{fra_stats['max_c']:.1f}, fraPct:{fra_stats['frac_pct']:.2f},"
         if fra_stats else ''
     )
+    label_fr_js = ref['label_fr'].replace("'", "\\'")
     print(
         f"  {{date:'{date_str}', "
         f"enDay:'{en_day}', frDay:'{fr_day}', "
         f"refIso3:'{ref['iso3']}', "
-        f"refEn:'{ref['label_en']}', refFr:'{ref['label_fr']}', "
+        f"refEn:'{ref['label_en']}', refFr:'{label_fr_js}', "
         f"iso2:'{ref['iso2']}', "
         f"refMaxC:{r0['threshold_c']},{fra_part} "
         f"planetPct:{round(ref['frac_pct'], 2)}}}"

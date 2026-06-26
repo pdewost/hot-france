@@ -86,7 +86,7 @@ def _stat_line(thr: float, pct: float, lang: str,
     if lang == 'fr':
         T = T.replace('.', ',')
         P = P.replace('.', ',')
-        return f'Température maximale : {_bare_fr(ref_label_fr)} {T} °C  ·  {P} % de la planète plus chaude'
+        return f'Température maximale : {ref_label_fr} {T} °C  ·  {P} % de la planète plus chaude'
     return f"{ref_label_en}'s hottest {T}°C  ·  {P}% of the planet was hotter"
 
 
@@ -272,11 +272,10 @@ def render_map(
             markerfacecolor='none', transform=ccrs.PlateCarree(),
             zorder=6, path_effects=[halo])
 
-    # Flag emoji — placed to the left of the crosshair
+    # Collect emoji overlay positions (geo coords → resolved to pixels before savefig)
+    _emoji_geo = []  # [(lon, lat, emoji, ha)]
     if ref_flag:
-        ax.text(crosshair_lon, crosshair_lat, ref_flag,
-                transform=ccrs.PlateCarree(),
-                fontsize=16, ha='right', va='center', zorder=7, clip_on=True)
+        _emoji_geo.append((crosshair_lon, crosshair_lat, ref_flag, 'right'))
 
     # ------------------------------------------------------------------
     # 7b. France secondary overlay (when France is not the reference)
@@ -297,9 +296,7 @@ def render_map(
                               facecolor='none', edgecolor=fra_outline,
                               linewidth=0.8, linestyle=(0, (4, 3)), zorder=5)
             c = fra_geom.centroid
-            ax.text(c.x, c.y, '🇫🇷',
-                    transform=ccrs.PlateCarree(),
-                    fontsize=12, ha='center', va='center', zorder=7, clip_on=True)
+            _emoji_geo.append((c.x, c.y, '🇫🇷', 'center'))
 
     # ------------------------------------------------------------------
     # 8. Burnt-in text
@@ -323,12 +320,43 @@ def render_map(
     # ------------------------------------------------------------------
     # 9. Save + measure
     # ------------------------------------------------------------------
+    # Compute emoji pixel positions from axes transform (must be before close)
+    _emoji_px = []
+    if _emoji_geo:
+        dpi_  = fig.get_dpi()
+        fw    = fig.get_figwidth()  * dpi_
+        fh    = fig.get_figheight() * dpi_
+        bb    = ax.get_position()
+        ax_l, ax_r = bb.x0 * fw, bb.x1 * fw
+        ax_t, ax_b = (1 - bb.y1) * fh, (1 - bb.y0) * fh  # PIL top-down
+        xlim, ylim = ax.get_xlim(), ax.get_ylim()
+        for lon_, lat_, emoji_, ha_ in _emoji_geo:
+            rx, ry = ccrs.Robinson().transform_point(lon_, lat_, ccrs.PlateCarree())
+            px_ = ax_l + (rx - xlim[0]) / (xlim[1] - xlim[0]) * (ax_r - ax_l)
+            py_ = ax_t + (1 - (ry - ylim[0]) / (ylim[1] - ylim[0])) * (ax_b - ax_t)
+            _emoji_px.append((int(px_), int(py_), emoji_, ha_))
+
     plt.savefig(str(out_path), facecolor=tc['bg'], dpi=125, bbox_inches=None)
     plt.close(fig)
 
-    from PIL import Image
+    from PIL import Image, ImageDraw, ImageFont
     img = Image.open(out_path).convert('RGBA')
     w, h = img.size
+
+    if _emoji_px:
+        _EMOJI_FONT = '/System/Library/Fonts/Apple Color Emoji.ttc'
+        try:
+            efont = ImageFont.truetype(_EMOJI_FONT, size=30)
+            drw   = ImageDraw.Draw(img)
+            for px_, py_, emoji_, ha_ in _emoji_px:
+                bb_ = drw.textbbox((0, 0), emoji_, font=efont, embedded_color=True)
+                ew_, eh_ = bb_[2] - bb_[0], bb_[3] - bb_[1]
+                tx = (px_ - ew_ - 5) if ha_ == 'right' else (px_ - ew_ // 2)
+                ty = py_ - eh_ // 2
+                drw.text((tx, ty), emoji_, font=efont, embedded_color=True)
+            img.save(out_path)
+        except (OSError, IOError, AttributeError):
+            pass  # Emoji font unavailable — silently skip overlay
 
     n_hot_cells   = int((~world_hot.isnull()).sum())
     hot_cell_pct  = 100.0 * n_hot_cells / world_hot.size
