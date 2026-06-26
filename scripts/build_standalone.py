@@ -17,10 +17,9 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-SITE = ROOT / "site"
-MAPS = SITE / "assets" / "maps"
-SRC = SITE / "index.html"
-DEST = SITE / "hot-france-standalone.html"
+MAPS = ROOT / "assets" / "maps"
+SRC = ROOT / "index.html"
+DEST = ROOT / "hot-france-standalone.html"
 
 
 def main() -> int:

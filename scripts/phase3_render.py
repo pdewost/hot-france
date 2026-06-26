@@ -37,7 +37,7 @@ THEMES = ['dark', 'light']
 LANGS  = ['en', 'fr']
 
 _OUTPUTS_DIR  = _PROJECT_ROOT / 'outputs'
-_SITE_MAPS_DIR = _PROJECT_ROOT / 'site' / 'assets' / 'maps'
+_SITE_MAPS_DIR = _PROJECT_ROOT / 'assets' / 'maps'
 
 
 def _filename(date_str: str, theme: str, lang: str) -> str:

@@ -11,7 +11,7 @@ Usage:
 Steps:
   1. Fetch (or cache-hit) IFS grid for the date
   2. Discover editorial reference country (coolest candidate below target %)
-  3. Render 4 maps (dark/light × EN/FR) into outputs/ and site/assets/maps/
+  3. Render 4 maps (dark/light × EN/FR) into outputs/ and assets/maps/
   4. Print the DATA entry to paste into site/index.html
 
 Maps are named: hotter_than_{iso3}_{date}_{theme}_{lang}.png
@@ -33,7 +33,7 @@ from src.render.wapo_map import render_map
 from scripts.discover_today import discover, CANDIDATES  # noqa: E402
 
 _OUTPUTS_DIR   = _PROJECT_ROOT / 'outputs'
-_SITE_MAPS_DIR = _PROJECT_ROOT / 'site' / 'assets' / 'maps'
+_SITE_MAPS_DIR = _PROJECT_ROOT / 'assets' / 'maps'
 
 THEMES = ['dark', 'light']
 LANGS  = ['en', 'fr']
@@ -150,7 +150,7 @@ def main():
         f"planetPct:{round(ref['frac_pct'], 2)}}}"
     )
     print(f'{"─" * 72}')
-    print(f'\nMaps in site/assets/maps/ and outputs/ (not pushed).')
+    print(f'\nMaps in assets/maps/ and outputs/ (not pushed).')
     print(f'{"=" * 72}')
 
     return render_results, ref
