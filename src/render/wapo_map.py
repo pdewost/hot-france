@@ -1,24 +1,21 @@
 """
-wapo_map.py — WaPo/Ben-Noll-style world map renderer for Hotter-Than-France.
+wapo_map.py — WaPo/Ben-Noll-style world map renderer (generic reference country).
 
-Renders a clean world map (Robinson projection) highlighting:
-  - Grid cells STRICTLY hotter than France's hottest grid cell (world_hot layer)
-  - Metropolitan France itself, temperature-coloured on the SAME continuous ramp
-  - A crosshair marker at France's hottest cell
+Renders a Robinson projection world map highlighting:
+  - Grid cells STRICTLY hotter than the reference country's hottest grid cell
+  - The reference country itself, temperature-coloured on the same continuous ramp
+  - A crosshair marker at the hottest cell
   - Localized burnt-in title / date / stat text bands
 
-Two theme variants:
-  'dark'  — #1C1C1E background, muted dark land, for the site's night mode.
-  'light' — #FFFFFF background, muted light land, for day mode.
-
-Two lang variants: 'en' (English) / 'fr' (French).
-
-Output: 1600x900 PNG (12.8 x 7.2 in @ 125 dpi).
+Two theme variants: 'dark' / 'light'.
+Two lang variants:  'en' / 'fr'.
+Output: 1600×900 PNG.
 
 No side effects on import.
 """
 from __future__ import annotations
 
+from datetime import date as _date
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -26,12 +23,12 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 THEMES: dict[str, dict[str, str]] = {
     'dark': {
-        'bg': '#1C1C1E',       # card background = out-of-globe area
-        'ocean': '#23272F',    # globe interior; distinct from bg so the Robinson globe reads
+        'bg': '#1C1C1E',
+        'ocean': '#23272F',
         'land': '#3C3C40',
         'coast': '#5A5A5E',
-        'outline': '#3A3A3F',  # faint Robinson globe boundary
-        'france_outline': '#E8E8EA',  # high-contrast France polygon border
+        'outline': '#3A3A3F',
+        'ref_outline': '#E8E8EA',
         'title': '#F5F5F7',
         'sub': '#A1A1A6',
     },
@@ -41,74 +38,102 @@ THEMES: dict[str, dict[str, str]] = {
         'land': '#D4D6DD',
         'coast': '#B6B6BD',
         'outline': '#C8CCD4',
-        'france_outline': '#33343A',  # high-contrast France polygon border
+        'ref_outline': '#33343A',
         'title': '#1D1D1F',
         'sub': '#6E6E73',
     },
 }
 
 # ---------------------------------------------------------------------------
-# Localised strings
+# Localisation helpers
 # ---------------------------------------------------------------------------
-_TITLES = {
-    'en': 'Only places hotter than France',
-    'fr': 'Seuls les endroits plus chauds que la France',
-}
+_DAYS_EN   = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+_MONTHS_EN = ['January','February','March','April','May','June','July',
+               'August','September','October','November','December']
+_DAYS_FR   = ['lundi','mardi','mercredi','jeudi','vendredi','samedi','dimanche']
+_MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet',
+               'août','septembre','octobre','novembre','décembre']
 
 _CREDITS = {
     'en': 'ECMWF IFS forecast · independent reconstruction',
     'fr': 'Prévision IFS CEPMMT · reconstruction indépendante',
 }
 
-_DATE_LABELS: dict[tuple[str, str], str] = {
-    ('2026-06-22', 'en'): 'Monday 22 June 2026',
-    ('2026-06-22', 'fr'): 'lundi 22 juin 2026',
-    ('2026-06-23', 'en'): 'Tuesday 23 June 2026',
-    ('2026-06-23', 'fr'): 'mardi 23 juin 2026',
-    ('2026-06-24', 'en'): 'Wednesday 24 June 2026',
-    ('2026-06-24', 'fr'): 'mercredi 24 juin 2026',
-}
+
+def _date_label(date_str: str, lang: str) -> str:
+    d = _date.fromisoformat(date_str)
+    if lang == 'fr':
+        return f"{_DAYS_FR[d.weekday()]} {d.day} {_MONTHS_FR[d.month - 1]} {d.year}"
+    return f"{_DAYS_EN[d.weekday()]} {d.day} {_MONTHS_EN[d.month - 1]} {d.year}"
 
 
-def _stat_line(thr: float, pct: float, lang: str) -> str:
-    """Build the stat string for a given threshold + fraction."""
+def _title_line(ref_label_en: str, ref_label_fr: str, lang: str) -> str:
+    if lang == 'fr':
+        return f'Seuls les endroits plus chauds que {ref_label_fr}'
+    return f'Only places hotter than {ref_label_en}'
+
+
+def _stat_line(thr: float, pct: float, lang: str,
+               ref_label_en: str, ref_label_fr: str) -> str:
     T = f'{thr:.1f}'
     P = f'{pct:.2f}'
     if lang == 'fr':
         T = T.replace('.', ',')
         P = P.replace('.', ',')
-        return f'Maximum France {T} °C  ·  {P} % de la planète plus chaude'
-    else:
-        return f"France's hottest {T}°C  ·  {P}% of the planet was hotter"
+        return f'Maximum {ref_label_fr} {T} °C  ·  {P} % de la planète plus chaude'
+    return f"{ref_label_en}'s hottest {T}°C  ·  {P}% of the planet was hotter"
 
 
-def render_map(date_str: str, theme: str, lang: str, out_path: str | Path) -> dict:
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
+
+def render_map(
+    date_str: str,
+    theme: str,
+    lang: str,
+    out_path: str | Path,
+    *,
+    ref_iso3: str = 'FRA',
+    ref_bbox: tuple | None = None,
+    ref_label_en: str = 'France',
+    ref_label_fr: str = 'la France',
+) -> dict:
     """Render a single WaPo-style world map and save it as PNG.
 
     Parameters
     ----------
     date_str : str
-        Date in 'YYYY-MM-DD' format, e.g. '2026-06-22'. A matching GRIB file
-        must already exist in <project_root>/data/.
+        Date 'YYYY-MM-DD'. A GRIB cache file must exist in <project_root>/data/.
     theme : str
-        'dark' or 'light' — selects the colour palette from THEMES.
+        'dark' or 'light'.
     lang : str
-        'en' or 'fr' — selects the text language for the burnt-in labels.
+        'en' or 'fr'.
     out_path : str or Path
-        Full path (including filename) where the PNG will be written.
-        Parent directories are created automatically.
+        Full PNG output path (parent dirs created automatically).
+    ref_iso3 : str
+        ISO 3166-1 alpha-3 code for the reference country (default 'FRA').
+        'FRA' triggers the metropolitan_france_* helpers (overseas-safe).
+        Any other code uses the generic country_mask / country_geometry.
+    ref_bbox : tuple or None
+        (lon_min, lat_min, lon_max, lat_max) clip applied to the reference
+        country geometry — useful to exclude island territories.
+    ref_label_en : str
+        English display name for the reference country (e.g. 'Morocco').
+    ref_label_fr : str
+        French display name including article (e.g. 'le Maroc').
 
     Returns
     -------
     dict with keys:
-        threshold_c    : float — France's max temperature (degC) used as threshold.
-        france_min_c   : float — France's minimum temperature within the mask (degC).
-        crosshair_lat  : float — latitude of France's hottest grid cell.
-        crosshair_lon  : float — longitude of France's hottest grid cell.
-        width          : int   — image width in pixels.
-        height         : int   — image height in pixels.
-        hot_cell_pct   : float — % of global 0.25° grid cells where daily-max > threshold
-                                 (UNWEIGHTED grid-cell fraction — rough sanity proxy).
+        threshold_c   : float — ref country's max temperature (°C).
+        ref_min_c     : float — ref country's minimum temperature (°C).
+        crosshair_lat : float — latitude of the hottest grid cell.
+        crosshair_lon : float — longitude of the hottest grid cell.
+        width         : int   — image width in pixels.
+        height        : int   — image height in pixels.
+        hot_cell_pct  : float — unweighted grid-cell fraction where T > threshold
+                                (sanity proxy; not the cos-lat area-weighted figure).
     """
     if theme not in THEMES:
         raise ValueError(f"Unknown theme {theme!r}. Use 'dark' or 'light'.")
@@ -120,45 +145,14 @@ def render_map(date_str: str, theme: str, lang: str, out_path: str | Path) -> di
     out_path.parent.mkdir(parents=True, exist_ok=True)
 
     # ------------------------------------------------------------------
-    # 1. Load data and compute threshold / France temps
+    # 0. Imports
     # ------------------------------------------------------------------
     import sys as _sys
     _project_root = Path(__file__).resolve().parent.parent.parent
     if str(_project_root) not in _sys.path:
         _sys.path.insert(0, str(_project_root))
 
-    from src.loaders.ecmwf_opendata import load_daily_tmax
-    from src.core.france import metropolitan_france_mask, metropolitan_france_geometry
-    from src.core.threshold import france_threshold, planet_fraction_hotter
-
-    da = load_daily_tmax(date_str)
-    mask = metropolitan_france_mask(da, verbose=False)
-    thr = france_threshold(da, mask, method='max')
-
-    france_temps = da.where(mask)          # NaN outside France
-    france_min = float(france_temps.min())
-
-    # World cells STRICTLY hotter than France
-    world_hot = da.where(da > thr)
-
-    # Continuous colour scale: France occupies [base..thr], world-hotter [thr..52]
-    base = max(25.0, float(__import__('numpy').floor(france_min)))
-
-    # Planet fraction (cos-lat weighted)
-    pct = planet_fraction_hotter(da, thr, domain='all')
-
-    # ------------------------------------------------------------------
-    # 2. Find France's hottest cell for crosshair
-    # ------------------------------------------------------------------
     import numpy as np
-
-    am = france_temps.argmax(dim=['lat', 'lon'])
-    crosshair_lat = float(da.lat[am['lat']])
-    crosshair_lon = float(da.lon[am['lon']])
-
-    # ------------------------------------------------------------------
-    # 3. Matplotlib + Cartopy setup
-    # ------------------------------------------------------------------
     import matplotlib
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
@@ -168,10 +162,49 @@ def render_map(date_str: str, theme: str, lang: str, out_path: str | Path) -> di
     import cartopy.feature as cfeature
     from cartopy.util import add_cyclic_point
 
+    from src.loaders.ecmwf_opendata import load_daily_tmax
+    from src.core.threshold import france_threshold, planet_fraction_hotter
+
+    # ------------------------------------------------------------------
+    # 1. Load grid
+    # ------------------------------------------------------------------
+    da = load_daily_tmax(date_str)
+
+    # ------------------------------------------------------------------
+    # 2. Build reference-country mask + geometry
+    # ------------------------------------------------------------------
+    if ref_iso3.upper() == 'FRA':
+        from src.core.france import metropolitan_france_mask, metropolitan_france_geometry
+        mask   = metropolitan_france_mask(da, verbose=False)
+        ref_geom = metropolitan_france_geometry()
+    else:
+        from src.core.country import country_mask, country_geometry
+        mask   = country_mask(da, ref_iso3.upper(), ref_bbox)
+        ref_geom = country_geometry(ref_iso3.upper(), ref_bbox)
+
+    # ------------------------------------------------------------------
+    # 3. Compute stats
+    # ------------------------------------------------------------------
+    thr = france_threshold(da, mask, method='max')   # works for any mask
+
+    ref_temps = da.where(mask)                         # NaN outside ref country
+    ref_min   = float(ref_temps.min())
+    world_hot = da.where(da > thr)
+
+    base = max(25.0, float(np.floor(ref_min)))
+    pct  = planet_fraction_hotter(da, thr, domain='all')
+
+    # Crosshair — hottest cell inside ref country
+    am = ref_temps.argmax(dim=['lat', 'lon'])
+    crosshair_lat = float(da.lat[am['lat']])
+    crosshair_lon = float(da.lon[am['lon']])
+
+    # ------------------------------------------------------------------
+    # 4. Figure + axes
+    # ------------------------------------------------------------------
     fig = plt.figure(figsize=(12.8, 7.2), dpi=125)
     fig.patch.set_facecolor(tc['bg'])
 
-    # Shrink map axes to leave top + bottom bands for text
     ax = fig.add_axes([0, 0.10, 1, 0.78], projection=ccrs.Robinson())
     ax.set_global()
     ax.patch.set_facecolor(tc['ocean'])
@@ -179,187 +212,97 @@ def render_map(date_str: str, theme: str, lang: str, out_path: str | Path) -> di
     ax.spines['geo'].set_edgecolor(tc['outline'])
     ax.spines['geo'].set_linewidth(0.8)
 
-    # ------------------------------------------------------------------
-    # 4. Base map: 110m land polygons
-    # ------------------------------------------------------------------
+    # Base land + coastlines
     land_feature = cfeature.NaturalEarthFeature(
-        'physical', 'land', '110m',
-        facecolor=tc['land'],
-        edgecolor='none',
-    )
+        'physical', 'land', '110m', facecolor=tc['land'], edgecolor='none')
     ax.add_feature(land_feature, zorder=1)
-
-    # ------------------------------------------------------------------
-    # 5. Coastlines
-    # ------------------------------------------------------------------
     try:
         ax.coastlines(linewidth=0.4, color=tc['coast'], zorder=2)
-    except Exception as _exc:
-        print(f"[render_map] coastlines() failed ({_exc!r}), "
-              "drawing outline from land polygons instead.")
+    except Exception:
         land_outline = cfeature.NaturalEarthFeature(
-            'physical', 'land', '110m',
-            facecolor='none',
-            edgecolor=tc['coast'],
-        )
+            'physical', 'land', '110m', facecolor='none', edgecolor=tc['coast'])
         ax.add_feature(land_outline, linewidth=0.4, zorder=2)
 
     # ------------------------------------------------------------------
-    # 6. Continuous colour norm shared by France fill + world-hot overlay
+    # 5. Temperature layers (shared colour norm)
     # ------------------------------------------------------------------
     norm = mcolors.Normalize(vmin=base, vmax=52)
     cmap_name = 'YlOrRd'
 
-    # --- World-hot overlay (add_cyclic_point prevents antimeridian seam) ---
     lons_arr = da.lon.values
     lats_arr = da.lat.values
 
+    # World-hot overlay
     hot_vals = world_hot.values
     data_cyclic, lon_cyclic = add_cyclic_point(hot_vals, coord=lons_arr)
+    ax.pcolormesh(lon_cyclic, lats_arr, data_cyclic,
+                  transform=ccrs.PlateCarree(), cmap=cmap_name, norm=norm,
+                  shading='auto', zorder=3)
 
-    ax.pcolormesh(
-        lon_cyclic,
-        lats_arr,
-        data_cyclic,
-        transform=ccrs.PlateCarree(),
-        cmap=cmap_name,
-        norm=norm,
-        shading='auto',
-        zorder=3,
-    )
-
-    # --- France temperature fill ---
-    fr_vals = france_temps.values
-    fr_cyclic, _ = add_cyclic_point(fr_vals, coord=lons_arr)
-
-    ax.pcolormesh(
-        lon_cyclic,
-        lats_arr,
-        fr_cyclic,
-        transform=ccrs.PlateCarree(),
-        cmap=cmap_name,
-        norm=norm,
-        shading='auto',
-        zorder=3,
-    )
+    # Reference-country temperature fill
+    ref_cyclic, _ = add_cyclic_point(ref_temps.values, coord=lons_arr)
+    ax.pcolormesh(lon_cyclic, lats_arr, ref_cyclic,
+                  transform=ccrs.PlateCarree(), cmap=cmap_name, norm=norm,
+                  shading='auto', zorder=3)
 
     # ------------------------------------------------------------------
-    # 7. France outline polygon
+    # 6. Reference-country outline
     # ------------------------------------------------------------------
-    france_geom = metropolitan_france_geometry()
-    ax.add_geometries(
-        [france_geom],
-        crs=ccrs.PlateCarree(),
-        facecolor='none',
-        edgecolor=tc['france_outline'],
-        linewidth=0.9,
-        zorder=5,
-    )
+    if ref_geom is not None and not ref_geom.is_empty:
+        ax.add_geometries([ref_geom], crs=ccrs.PlateCarree(),
+                          facecolor='none', edgecolor=tc['ref_outline'],
+                          linewidth=0.9, zorder=5)
 
     # ------------------------------------------------------------------
-    # 8. Crosshair at France's hottest cell
-    #    White core + dark halo so it's readable on warm fill in both themes
+    # 7. Crosshair
     # ------------------------------------------------------------------
-    halo_stroke = pe.withStroke(linewidth=3.0, foreground='#111111')
-
-    ax.plot(
-        crosshair_lon, crosshair_lat,
-        '+',
-        color='white',
-        markersize=15,
-        markeredgewidth=1.8,
-        transform=ccrs.PlateCarree(),
-        zorder=6,
-        path_effects=[halo_stroke],
-    )
-    ax.plot(
-        crosshair_lon, crosshair_lat,
-        'o',
-        color='none',
-        markersize=11,
-        markeredgecolor='white',
-        markeredgewidth=1.4,
-        markerfacecolor='none',
-        transform=ccrs.PlateCarree(),
-        zorder=6,
-        path_effects=[halo_stroke],
-    )
+    halo = pe.withStroke(linewidth=3.0, foreground='#111111')
+    ax.plot(crosshair_lon, crosshair_lat, '+', color='white',
+            markersize=15, markeredgewidth=1.8, transform=ccrs.PlateCarree(),
+            zorder=6, path_effects=[halo])
+    ax.plot(crosshair_lon, crosshair_lat, 'o', color='none',
+            markersize=11, markeredgecolor='white', markeredgewidth=1.4,
+            markerfacecolor='none', transform=ccrs.PlateCarree(),
+            zorder=6, path_effects=[halo])
 
     # ------------------------------------------------------------------
-    # 9. Burnt-in text labels
+    # 8. Burnt-in text
     # ------------------------------------------------------------------
-    title_text = _TITLES[lang]
-    date_label = _DATE_LABELS.get((date_str, lang), date_str)
-    stat_text = _stat_line(thr, pct, lang)
-    credit_text = _CREDITS[lang]
+    fig.text(0.025, 0.95,
+             _title_line(ref_label_en, ref_label_fr, lang),
+             fontsize=17, fontweight='bold', color=tc['title'], ha='left', va='top')
 
-    # Title — top-left, bold ~17pt
-    fig.text(
-        0.025, 0.95,
-        title_text,
-        fontsize=17,
-        fontweight='bold',
-        color=tc['title'],
-        ha='left',
-        va='top',
-    )
+    fig.text(0.025, 0.905,
+             _date_label(date_str, lang),
+             fontsize=11, color=tc['sub'], ha='left', va='top')
 
-    # Date — just below title, ~11pt, sub colour
-    fig.text(
-        0.025, 0.905,
-        date_label,
-        fontsize=11,
-        color=tc['sub'],
-        ha='left',
-        va='top',
-    )
+    fig.text(0.025, 0.055,
+             _stat_line(thr, pct, lang, ref_label_en, ref_label_fr),
+             fontsize=11, color=tc['title'], ha='left', va='bottom')
 
-    # Stat — bottom-left, ~11pt
-    fig.text(
-        0.025, 0.055,
-        stat_text,
-        fontsize=11,
-        color=tc['title'],
-        ha='left',
-        va='bottom',
-    )
-
-    # Credit — bottom-right, ~9pt, sub colour
-    fig.text(
-        0.975, 0.045,
-        credit_text,
-        fontsize=9,
-        color=tc['sub'],
-        ha='right',
-        va='bottom',
-    )
+    fig.text(0.975, 0.045,
+             _CREDITS[lang],
+             fontsize=9, color=tc['sub'], ha='right', va='bottom')
 
     # ------------------------------------------------------------------
-    # 10. Save
+    # 9. Save + measure
     # ------------------------------------------------------------------
     plt.savefig(str(out_path), facecolor=tc['bg'], dpi=125, bbox_inches=None)
     plt.close(fig)
 
-    # ------------------------------------------------------------------
-    # 11. Measure output
-    # ------------------------------------------------------------------
     from PIL import Image
-
     img = Image.open(out_path).convert('RGBA')
     w, h = img.size
 
-    # Sanity proxy: fraction of global 0.25° grid cells strictly hotter than France
-    # (UNWEIGHTED — not the cos-lat area-weighted figure; that lives in Phase 2).
-    n_hot_cells = int((~world_hot.isnull()).sum())
-    n_total_cells = world_hot.size
-    hot_cell_pct = 100.0 * n_hot_cells / n_total_cells
+    n_hot_cells   = int((~world_hot.isnull()).sum())
+    hot_cell_pct  = 100.0 * n_hot_cells / world_hot.size
 
     return {
-        'threshold_c': round(thr, 2),
-        'france_min_c': round(france_min, 2),
+        'threshold_c':   round(thr, 2),
+        'ref_min_c':     round(ref_min, 2),
         'crosshair_lat': round(crosshair_lat, 4),
         'crosshair_lon': round(crosshair_lon, 4),
-        'width': w,
-        'height': h,
-        'hot_cell_pct': round(hot_cell_pct, 3),
+        'width':         w,
+        'height':        h,
+        'hot_cell_pct':  round(hot_cell_pct, 3),
     }

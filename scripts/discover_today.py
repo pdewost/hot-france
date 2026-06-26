@@ -32,38 +32,39 @@ from src.core.country import country_mask
 from src.core.threshold import planet_fraction_hotter
 
 # ---------------------------------------------------------------------------
-# Candidate list: (display_label, iso3, bbox_or_None, special_or_None)
+# Candidate list: (label_en, iso3, bbox_or_None, special_or_None, label_fr)
 # bbox   = (lon_min, lat_min, lon_max, lat_max) — clips overseas territories
 # special= 'france' uses the dedicated metropolitan_france_mask (more precise)
+# label_fr includes the definite article (used in map burnt-in text)
 # ---------------------------------------------------------------------------
 CANDIDATES = [
     # Europe west / south
-    ('France',        'FRA', None,              'france'),  # metropolitan mask
-    ('Spain',         'ESP', (-10, 35,  5, 45), None),      # excl. Canary Islands
-    ('Portugal',      'PRT', (-10, 36, -6, 42), None),      # excl. Azores + Madeira
-    ('Italy',         'ITA', (  6, 36, 19, 48), None),      # incl. Sicily/Sardinia
-    ('Greece',        'GRC', ( 19, 34, 30, 42), None),
+    ('France',       'FRA', None,             'france', 'la France'),
+    ('Spain',        'ESP', (-10,35, 5,45),   None,     "l'Espagne"),
+    ('Portugal',     'PRT', (-10,36,-6,42),   None,     'le Portugal'),
+    ('Italy',        'ITA', (  6,36,19,48),   None,     "l'Italie"),
+    ('Greece',       'GRC', ( 19,34,30,42),   None,     'la Grèce'),
     # Europe central / north
-    ('Germany',       'DEU', None,              None),
-    ('Austria',       'AUT', None,              None),
-    ('Switzerland',   'CHE', None,              None),
-    ('Hungary',       'HUN', None,              None),
-    ('Romania',       'ROU', None,              None),
-    ('UK',            'GBR', ( -8, 49,  2, 62), None),      # excl. Gibraltar
+    ('Germany',      'DEU', None,             None,     "l'Allemagne"),
+    ('Austria',      'AUT', None,             None,     "l'Autriche"),
+    ('Switzerland',  'CHE', None,             None,     'la Suisse'),
+    ('Hungary',      'HUN', None,             None,     'la Hongrie'),
+    ('Romania',      'ROU', None,             None,     'la Roumanie'),
+    ('UK',           'GBR', ( -8,49, 2,62),   None,     'le Royaume-Uni'),
     # Balkans / eastern Med
-    ('Turkey',        'TUR', ( 25, 35, 45, 43), None),
-    ('Bulgaria',      'BGR', None,              None),
-    ('Serbia',        'SRB', None,              None),
+    ('Turkey',       'TUR', ( 25,35,45,43),   None,     'la Turquie'),
+    ('Bulgaria',     'BGR', None,             None,     'la Bulgarie'),
+    ('Serbia',       'SRB', None,             None,     'la Serbie'),
     # North Africa
-    ('Morocco',       'MAR', None,              None),
-    ('Algeria',       'DZA', None,              None),
-    ('Tunisia',       'TUN', None,              None),
-    ('Libya',         'LBY', None,              None),
-    ('Egypt',         'EGY', None,              None),
+    ('Morocco',      'MAR', None,             None,     'le Maroc'),
+    ('Algeria',      'DZA', None,             None,     "l'Algérie"),
+    ('Tunisia',      'TUN', None,             None,     'la Tunisie'),
+    ('Libya',        'LBY', None,             None,     'la Libye'),
+    ('Egypt',        'EGY', None,             None,     "l'Égypte"),
     # Middle East
-    ('Israel',        'ISR', None,              None),
-    ('Jordan',        'JOR', None,              None),
-    ('Saudi Arabia',  'SAU', None,              None),
+    ('Israel',       'ISR', None,             None,     'Israël'),
+    ('Jordan',       'JOR', None,             None,     'la Jordanie'),
+    ('Saudi Arabia', 'SAU', None,             None,     "l'Arabie Saoudite"),
 ]
 
 
@@ -71,6 +72,57 @@ def _build_mask(da, iso3, bbox, special):
     if special == 'france':
         return metropolitan_france_mask(da, verbose=False)
     return country_mask(da, iso3, bbox)
+
+
+def discover(da, target_pct: float = 0.8, candidates=None):
+    """Run the ranking loop on a preloaded DataArray.
+
+    Parameters
+    ----------
+    da : xr.DataArray
+        Normalized daily-max temperature grid (°C, lat/lon).
+    target_pct : float
+        Planet-fraction threshold in percent (default 0.8).
+    candidates : list or None
+        Override CANDIDATES list; defaults to module-level CANDIDATES.
+
+    Returns
+    -------
+    results  : list of dicts (sorted ascending by frac_pct)
+    extreme  : dict — hottest candidate (smallest fraction)
+    editorial: dict — most relatable candidate (largest fraction still below target)
+    """
+    if candidates is None:
+        candidates = CANDIDATES
+
+    results = []
+    for label_en, iso3, bbox, special, label_fr in candidates:
+        try:
+            mask    = _build_mask(da, iso3, bbox, special)
+            n_cells = int(mask.values.sum())
+            if n_cells == 0:
+                continue
+            country_max_c = float(da.where(mask).max().values)
+            frac_pct      = planet_fraction_hotter(da, country_max_c)
+            results.append({
+                'label_en': label_en,
+                'label_fr': label_fr,
+                'iso3':     iso3.lower(),
+                'bbox':     bbox,
+                'special':  special,
+                'max_c':    country_max_c,
+                'frac_pct': frac_pct,
+                'n_cells':  n_cells,
+                'passes':   frac_pct < target_pct,
+            })
+        except Exception:
+            pass
+
+    results.sort(key=lambda r: r['frac_pct'])
+    passing  = [r for r in results if r['passes']]
+    extreme  = passing[0]  if passing else None
+    editorial = passing[-1] if passing else None
+    return results, extreme, editorial
 
 
 def main():
@@ -96,34 +148,25 @@ def main():
     da = load_daily_tmax(date_str)
     print(f'[load] Grid: {dict(da.sizes)}\n')
 
-    results = []
-
-    for label, iso3, bbox, special in CANDIDATES:
+    # Print progress line-by-line while running the ranking
+    for label_en, iso3, bbox, special, label_fr in CANDIDATES:
         try:
-            mask = _build_mask(da, iso3, bbox, special)
+            mask    = _build_mask(da, iso3, bbox, special)
             n_cells = int(mask.values.sum())
             if n_cells == 0:
-                print(f'  [!] {label:<16} SKIP — 0 cells in mask')
+                print(f'  [!] {label_en:<16} SKIP — 0 cells in mask')
                 continue
-
             country_max_c = float(da.where(mask).max().values)
-            # planet_fraction_hotter already returns %, do NOT multiply again
-            frac_pct = planet_fraction_hotter(da, country_max_c)
-
-            passes = frac_pct < target_pct
-            results.append({
-                'label':    label,
-                'iso3':     iso3,
-                'max_c':    country_max_c,
-                'frac_pct': frac_pct,
-                'n_cells':  n_cells,
-                'passes':   passes,
-            })
+            frac_pct      = planet_fraction_hotter(da, country_max_c)
+            passes        = frac_pct < target_pct
             tick = '✓' if passes else ' '
-            print(f'  [{tick}] {label:<16} max={country_max_c:>5.2f} °C  '
+            print(f'  [{tick}] {label_en:<16} max={country_max_c:>5.2f} °C  '
                   f'hotter={frac_pct:>6.3f}%  cells={n_cells}')
         except Exception as e:
-            print(f'  [!] {label:<16} ERROR: {e}')
+            print(f'  [!] {label_en:<16} ERROR: {e}')
+
+    # Full structured run via discover()
+    results, extreme, editorial = discover(da, target_pct)
 
     if not results:
         print('\nNo results — check GRIB download and shapefile cache.')
@@ -140,10 +183,6 @@ def main():
     print(f'  {"─"*16}  {"─"*7}  {"─"*9}  {"─"*8}  {"─"*6}')
 
     passing = [r for r in results if r['passes']]
-    # "extreme"   = hottest (smallest fraction, first in sorted list)
-    # "editorial" = most relatable (largest fraction still below target = last passing)
-    extreme   = passing[0]  if passing else None
-    editorial = passing[-1] if passing else None
 
     for r in results:
         flag = ''
@@ -155,7 +194,7 @@ def main():
             flag = '← EXTREME'
         tick = '✓' if r['passes'] else ' '
         print(
-            f'  [{tick}] {r["label"]:<16} {r["max_c"]:>7.2f}  {r["frac_pct"]:>8.3f}%'
+            f'  [{tick}] {r["label_en"]:<16} {r["max_c"]:>7.2f}  {r["frac_pct"]:>8.3f}%'
             f'  {"yes" if r["passes"] else "no":>8}  {r["n_cells"]:>6}  {flag}'
         )
 
@@ -164,27 +203,27 @@ def main():
     if passing:
         print(f'\n  {len(passing)} candidate(s) pass the < {target_pct:.1f}% filter.')
         if editorial is not extreme:
-            print(f'\nExtreme   →  {extreme["label"]} ({extreme["iso3"]})')
+            print(f'\nExtreme   →  {extreme["label_en"]} ({extreme["iso3"].upper()})')
             print(f'  Max: {extreme["max_c"]:.2f} °C  |  Planet hotter: {extreme["frac_pct"]:.3f}%')
             print(f'  (hottest of all candidates — least of the planet beats it)')
-            print(f'\nEditorial →  {editorial["label"]} ({editorial["iso3"]})')
+            print(f'\nEditorial →  {editorial["label_en"]} ({editorial["iso3"].upper()})')
             print(f'  Max: {editorial["max_c"]:.2f} °C  |  Planet hotter: {editorial["frac_pct"]:.3f}%')
             print(f'  (most relatable country still below the {target_pct:.1f}% threshold)')
             print(f'  → "{editorial["frac_pct"]:.2f}% of the globe is strictly hotter '
-                  f'than {editorial["label"]}\'s hottest point today."')
+                  f'than {editorial["label_en"]}\'s hottest point today."')
         else:
-            print(f'\nWinner  →  {editorial["label"]} ({editorial["iso3"]})')
+            print(f'\nWinner  →  {editorial["label_en"]} ({editorial["iso3"].upper()})')
             print(f'  Max: {editorial["max_c"]:.2f} °C  |  Planet hotter: {editorial["frac_pct"]:.3f}%')
     else:
         closest = results[0]
         print(f'\n  No candidate passes < {target_pct:.1f}% today.')
-        print(f'  Closest: {closest["label"]} at {closest["frac_pct"]:.3f}%.')
+        print(f'  Closest: {closest["label_en"]} at {closest["frac_pct"]:.3f}%.')
         print(f'  Try --target {closest["frac_pct"]:.2f} to capture it.')
 
     print(f'\n{"=" * 72}')
-    return results, editorial
+    return results, editorial  # (results sorted asc, editorial = most-relatable passer)
 
 
 if __name__ == '__main__':
-    results, editorial = main()
+    main()
     sys.exit(0)

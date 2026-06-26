@@ -306,7 +306,7 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
   <div class="header-top">
     <div class="site-title">
       <span class="glyph" aria-hidden="true">&#9728;&#65039;</span>
-      <span data-i18n="title">Hotter than France</span>
+      <span id="siteTitle">Hotter than France</span>
     </div>
     <div class="header-controls">
       <span class="lang-toggle" onclick="toggleLang()" title="Switch language / Changer de langue"
@@ -322,8 +322,8 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 
   <!-- HERO -->
   <section class="hero">
-    <h1 class="hero-title" data-i18n="title">Hotter than France</h1>
-    <p class="hero-tagline" data-i18n="tagline">June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France's hottest place.</p>
+    <h1 class="hero-title" id="heroTitle">Hotter than France</h1>
+    <p class="hero-tagline" id="heroTagline">June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France's hottest place.</p>
   </section>
 
   <!-- RECORD CALLOUT -->
@@ -381,22 +381,23 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 <script>
 // ── DATA ──
 // Per-day = hottest 0.25° ECMWF IFS grid cell (00 UTC run); planetPct = cos-lat area-weighted
-// % of the globe strictly hotter than that cell. Calibration: 22 Jun 1.15% vs Noll's 1.2%.
+// % of the globe strictly hotter than refMaxC. refIso3 = ISO3 lowercase = map filename prefix.
+// Editorial reference country auto-discovered daily (coolest country still below 0.8% threshold).
 var DATA = [
-  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    franceMaxC:41.5, planetPct:1.15},
-  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    franceMaxC:42.1, planetPct:0.77},
-  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', franceMaxC:42.0, planetPct:0.76}
+  {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:41.5, planetPct:1.15},
+  {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.1, planetPct:0.77},
+  {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', refMaxC:42.0, planetPct:0.76},
+  {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'lby', refEn:'Libya',   refFr:'la Libye',  refMaxC:42.4, planetPct:0.68},
+  {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'mar', refEn:'Morocco', refFr:'le Maroc',  refMaxC:42.8, planetPct:0.69}
 ];
 
 // ── I18N ──
 // All string values use double-quotes to safely contain French apostrophes.
 var STRINGS = {
   en: {
-    title:                "Hotter than France",
-    tagline:              "June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France’s hottest place.",
     record:               "Tuesday 23 June 2026 was France’s hottest day on record — until Wednesday 24 June broke the record again.",
-    franceMax:            "France’s hottest",
-    planetHotter:         "Planet hotter than France",
+    refMax:               "Hottest point",
+    planetHotter:         "Planet fraction hotter",
     mapPending:           "Map pending",
     modelNote:            "Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official “record broken” figures are station observations — a separate measure.",
     methodTitle:          "How this was made",
@@ -407,7 +408,6 @@ var STRINGS = {
     footerData:           "Data: ECMWF IFS · Independent reconstruction, not affiliated with The Washington Post",
     footerDataLabel:      "Data",
     footerGeneratedLabel: "Generated",
-    docTitle:             "Hotter than France — June 2026 European heatwave",
     dayPanelsLabel:       "Daily panels",
     themeBtnTitle:        "Toggle dark mode",
     langBtnTitle:         "Switch language",
@@ -417,11 +417,9 @@ var STRINGS = {
     aboutP2:              "An institution, a supercomputer, decades of research — you would expect those forecasts to stay with governments. Yet part of them is now open data, under an open licence. A researcher, a company, a journalist, a developer, an ordinary citizen can download them, recombine them, fold them into a service — commercial ones included — on the single condition of crediting the source. That is Europe's digital strategy in practice: open the data, and let innovation follow. This map was born from it."
   },
   fr: {
-    title:                "Plus chaud que la France",
-    tagline:              "Juin 2026 — au plus fort de la canicule européenne, seule une infime partie de la planète était plus chaude que l’endroit le plus chaud de France.",
     record:               "Le mardi 23 juin 2026 fut le jour le plus chaud jamais enregistré en France — jusqu’à ce que le mercredi 24 juin batte de nouveau le record.",
-    franceMax:            "Maximum en France",
-    planetHotter:         "Planète plus chaude que la France",
+    refMax:               "Point le plus chaud",
+    planetHotter:         "Part de planète plus chaude",
     mapPending:           "Carte à venir",
     modelNote:            "Les valeurs quotidiennes correspondent à la cellule de grille la plus chaude du modèle (0,25°, IFS CEPMMT, run 00 UTC). À cette résolution, mardi et mercredi sont quasi à égalité (~42 °C) ; les records officiels « battus » sont des relevés de stations — une mesure distincte.",
     methodTitle:          "Méthode",
@@ -432,7 +430,6 @@ var STRINGS = {
     footerData:           "Données : IFS CEPMMT · Reconstruction indépendante, sans affiliation avec le Washington Post",
     footerDataLabel:      "Données",
     footerGeneratedLabel: "Généré",
-    docTitle:             "Plus chaud que la France — canicule européenne, juin 2026",
     dayPanelsLabel:       "Panneaux journaliers",
     themeBtnTitle:        "Basculer le mode sombre",
     langBtnTitle:         "Changer de langue",
@@ -445,6 +442,32 @@ var STRINGS = {
 
 function t(k) {
   return (STRINGS[state.lang] && STRINGS[state.lang][k]) || STRINGS.en[k] || k;
+}
+
+// ── DYNAMIC TITLE / TAGLINE (uses latest DATA entry's country) ──
+function _latestDay() { return DATA.length ? DATA[DATA.length - 1] : null; }
+
+function titleFor(lang) {
+  var d = _latestDay();
+  if (!d) return lang === 'fr' ? 'Plus chaud que...' : 'Hotter than...';
+  return lang === 'fr'
+    ? 'Plus chaud que ' + d.refFr
+    : 'Hotter than ' + d.refEn;
+}
+function taglineFor(lang) {
+  var d = _latestDay();
+  if (!d) return '';
+  var pct = d.planetPct !== null ? d.planetPct.toFixed(2) : '?';
+  return lang === 'fr'
+    ? 'Juin 2026 — seulement ' + pct + '% de la planète était plus chaud que ' + d.refFr + '.'
+    : 'June 2026 — only ' + pct + '% of the planet was hotter than ' + d.refEn + '’s hottest place.';
+}
+function docTitleFor(lang) {
+  var d = _latestDay();
+  if (!d) return 'Hotter than... — June 2026';
+  return lang === 'fr'
+    ? 'Plus chaud que ' + d.refFr + ' — canicule européenne, juin 2026'
+    : 'Hotter than ' + d.refEn + ' — June 2026 European heatwave';
 }
 
 // ── STATE (localStorage persistence) ──
@@ -481,8 +504,11 @@ function applyI18n() {
   var flagFr = document.getElementById('flagFr');
   if (flagEn) flagEn.className = state.lang === 'en' ? 'active' : '';
   if (flagFr) flagFr.className = state.lang === 'fr' ? 'active' : '';
-  // Translate non-textContent bits (tab title, a11y labels, tooltips)
-  document.title = t('docTitle');
+  // Dynamic per-country title / tagline / docTitle
+  var ht = document.getElementById('heroTitle');   if (ht) ht.textContent = titleFor(state.lang);
+  var hg = document.getElementById('heroTagline'); if (hg) hg.textContent = taglineFor(state.lang);
+  var st = document.getElementById('siteTitle');   if (st) st.textContent = titleFor(state.lang);
+  document.title = docTitleFor(state.lang);
   var ds = document.querySelector('.days-section'); if (ds) ds.setAttribute('aria-label', t('dayPanelsLabel'));
   var bt = document.getElementById('btnTheme');     if (bt) bt.setAttribute('title', t('themeBtnTitle'));
   var lt = document.querySelector('.lang-toggle');  if (lt) { lt.setAttribute('title', t('langBtnTitle')); lt.setAttribute('aria-label', t('langBtnTitle')); }
@@ -519,7 +545,7 @@ function dayCardHtml(day, featured) {
   var mapKey   = day.date + '_' + state.theme + '_' + state.lang;
   var imgPath  = (window.MAP_B64 && window.MAP_B64[mapKey])
                  ? window.MAP_B64[mapKey]
-                 : 'assets/maps/hotter_than_france_' + mapKey + '.png';
+                 : 'assets/maps/hotter_than_' + (day.refIso3 || 'fra') + '_' + mapKey + '.png';
   var pending  = t('mapPending');
   return (
     '<article class="day-card' + (featured ? ' day-card--featured' : '') + '">' +
@@ -537,11 +563,11 @@ function dayCardHtml(day, featured) {
         '</div>' +
         '<figcaption class="day-stats">' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + t('franceMax') + '</span>' +
-            fmtStat(day.franceMaxC == null ? null : day.franceMaxC.toFixed(1), '°C') +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Maximum ' + (day.refFr || 'France') : (day.refEn || 'France') + '’s hottest') + '</span>' +
+            fmtStat(day.refMaxC == null ? (day.franceMaxC == null ? null : day.franceMaxC.toFixed(1)) : day.refMaxC.toFixed(1), '°C') +
           '</div>' +
           '<div class="day-stat">' +
-            '<span class="day-stat-label">' + t('planetHotter') + '</span>' +
+            '<span class="day-stat-label">' + (state.lang === 'fr' ? 'Planète plus chaude que ' + (day.refFr || 'la France') : 'Planet hotter than ' + (day.refEn || 'France')) + '</span>' +
             fmtStat(day.planetPct == null ? null : day.planetPct.toFixed(2), '%') +
           '</div>' +
         '</figcaption>' +
