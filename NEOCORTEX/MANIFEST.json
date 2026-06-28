@@ -1,23 +1,23 @@
 {
   "spec": "NEOCORTEX_SPEC v1.0",
   "project": "Hotter-Than-France",
-  "updated": "2026-06-25",
+  "updated": "2026-06-27",
   "archive": {
     "exists": false,
     "span": "",
     "contents": "",
-    "note": "no archive yet — project just created"
+    "note": "no archive — project is actively updated"
   },
   "files": [
     {
       "file": "PLAN_reproduction_2026-06-25.md",
       "genre": "PLAN",
-      "status": "active — Phase 0 done; ready for Phase 1 (build ECMWF loader)"
+      "status": "partially stale — core pipeline + page delivered 2026-06-25; EU-scope refactor and daily-update loop added 2026-06-27"
     },
     {
       "file": "NOTE_phase0_data_probe_2026-06-25.md",
       "genre": "NOTE",
-      "status": "resolved — ECMWF IFS primary, GFS fallback; param mx2t3"
+      "status": "resolved — ECMWF IFS primary (`oper`, mx2t3, google mirror); ERA5 ruled out for live dates"
     }
   ]
 }

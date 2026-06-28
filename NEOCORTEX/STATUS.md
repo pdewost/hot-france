@@ -1,50 +1,58 @@
 # Hotter-Than-France — Status
-*Last updated: 2026-06-25*
+*Last updated: 2026-06-27*
 
 ## What this project is
-Reproduce — and be able to regenerate — Ben Noll's WaPo "ECMWF-based" world map that shades
-**only the places on Earth hotter than France's hottest place** during the June 2026 heatwave
-(target days: Mon 22, Tue 23, Wed 24 Jun). Output: a small reproducible Python pipeline + WaPo-style
-maps, calibrated against Noll's quoted planet-fraction figures (~1.2% / 0.93%).
+Reproduce Ben Noll's WaPo "ECMWF-based" world map shading **only the places on Earth hotter than the hottest point in Continental Europe** during the June 2026 heatwave. Output: a reproducible Python pipeline + WaPo-style maps + a live bilingual web page updated daily.
 
 ## Current phase
-**Shipped + published** — 2026-06-25. Pipeline (loader → France mask → threshold → calibration 1.145% vs Noll
-1.2% ✅) → **12 maps** (3 days × light/dark × EN/FR): Robinson, France temperature-choropleth + outline +
-crosshair on its hottest cell, burnt-in localized title/date/stat. Bilingual dark/light `site/index.html`
-(latest featured full-width + 2 previous below, click-to-zoom lightbox, theme+lang map swap, MAP_B64 standalone
-fallback). `scripts/build_standalone.py` → single-file `site/hot-france-standalone.html`. Published to
-**github.com/pdewost/hot-france** (public) + Pages at **pdewost.github.io/hot-france**.
-Remaining (optional): Phase 5 — ERA5 backfill (~29 Jun; scheduled task `htf-era5-backfill`).
+**DELIVERED + PUBLISHED + ACTIVELY UPDATED** — first shipped 2026-06-25.
+
+Live at **pdewost.github.io/hot-france** (GitHub Pages, branch `main`, repo root).
+
+Data coverage: **Mon 22 Jun → Sat 27 Jun 2026** (6 days, 24 maps).
+
+| Date | Ref country | Max °C | Planet % hotter |
+|------|-------------|--------|-----------------|
+| Mon 22 | Spain  | 42.31 | 0.84% |
+| Tue 23 | Spain  | 43.85 | 0.34% |
+| Wed 24 | France | 42.04 | 0.76% |
+| Thu 25 | France | 40.15 | 1.70% |
+| Fri 26 | Germany | 38.86 | 2.26% |
+| Sat 27 | Germany | 39.87 | 1.82% |
+
+## Architecture
+
+- **Pipeline:** `.venv/bin/python scripts/run_daily.py YYYY-MM-DD`
+  Downloads GRIB2 (ECMWF IFS `oper`, param `mx2t3`, steps 3–24, google mirror) → discovers EU reference country → renders 4 maps (dark/light × EN/FR). Prints a ready-to-paste DATA entry for `index.html`.
+- **EU-scope framing:** Reference = hottest Continental European country each day (no threshold). Non-EU countries appear as heat cells but are never the reference. France always shown as secondary overlay when not hottest.
+- **Page:** `index.html` at repo root (no `site/` subdirectory). `var DATA=[...]` inline array drives the displayed day, title, stats. `var STRINGS={en:{...}, fr:{...}}` for i18n. Theme+lang toggles persist in localStorage.
+- **Maps:** `assets/maps/hotter_than_{iso3}_{date}_{theme}_{lang}.png`
+- **Flags:** Twemoji PNGs in `assets/flags/`, composited at NW corner of country polygon (outside, upper-left) with white semi-transparent card backing.
+- **Favicon:** thermometer icon, `favicon-32.png` + `favicon-16.png` + `favicon.ico`; HTML uses `?v=4` cache-buster.
+- **Preview server:** `.claude/launch.json` at Design Projects level, port 8051, serves project root.
 
 ## Invariants
-1. **Data source = ECMWF IFS forecast (`oper`, param `mx2t3`), NOT ERA5** for these dates. ERA5/ERA5T
-   lags ~5 days–2 months (no 22–24 Jun on 25 Jun) and the WaPo map is IFS forecast, not reanalysis.
-   ECMWF AWS replica confirmed to hold all 3 dates. (CHALLENGE §2–§3 + NOTE_phase0, verified)
-2. **France = metropolitan only** (incl. Corsica). Natural Earth `FRA` includes tropical overseas
-   départements and corrupts the max threshold. (CHALLENGE §6, verified)
-3. **Provenance honesty.** Every map captions its real source/variable/window/threshold; never imply it IS WaPo's graphic. (PROJECT_BRIEF safety #1)
-4. **Calibration is quantitative**, not pixel-diff (original image is paywalled): reproduce Noll's ~1.2%/0.93% within tolerance.
-5. **Faithful threshold = single hottest France cell** (matches "France's hottest place"); percentile is a labelled sensitivity variant only.
+1. **Data = ECMWF IFS forecast (`oper`, `mx2t3`)** — NOT ERA5 (lags 5 days+, wrong product).
+2. **France = metropolitan only** (Natural Earth `FRA` includes overseas DOM → corrupts threshold).
+3. **Provenance honesty** — page captions source/variable/threshold; never claims to be the WaPo original.
+4. **Calibration:** Mon 22 = 1.145% planet hotter vs Noll's ~1.2% ✅.
+5. **JS safety:** straight double quotes only in `<script>` blocks; inner `"` must be `\"`. Smart/curly quotes (U+201C/U+201D) are invalid JS tokens — caused a full-page outage 2026-06-27.
+6. **`~/.cdsapirc` never committed.**
+7. **`source='google'`** (AWS mirror throttles downloads).
 
-## Next actions (all optional — core deliverable shipped)
-1. Phase 5 (~29 Jun+) — ERA5 backfill via corrected CDS once ERA5T covers 22–24 Jun; forecast-vs-reanalysis diff.
-2. If desired: serve/share the page (any static server over `site/`), or add more days as the heatwave evolves.
-3. If desired: confirm Noll's exact IFS sub-product (HRES/ENS/AIFS) by emailing him; we used deterministic `oper`.
+## Next actions (all optional)
+1. **Daily update:** run `.venv/bin/python scripts/run_daily.py YYYY-MM-DD`, paste DATA entry into `index.html`, commit+push maps and page.
+2. **Phase 5 (~29 Jun+):** ERA5 backfill via CDS once ERA5T covers 22–24 Jun; forecast-vs-reanalysis diff.
+3. **IFS sub-product:** used `oper`; confirm HRES/ENS/AIFS with Ben Noll (@BenNollWeather) if desired.
 
-✅ Done 2026-06-25: scaffold; source-workflow challenge (verified); Phase 0 probe (ECMWF IFS, mx2t3);
-**Phase 1 loader**; **Phase 2 mask+threshold+calibration (1.145% vs 1.2% ✅)**; **Phase 3 render — 6
-theme-aware Robinson maps** (visually confirmed); **bilingual dark/light page** (`site/index.html`, maps wired,
-Tue/Wed footnote, 19/19 i18n parity); `CALIBRATION.md`; nested git repo (3 commits).
+## Done log
+- 2026-06-25: scaffold; adversarial source-workflow challenge (verified); Phase 0 probe; Phase 1 loader; Phase 2 mask+threshold+calibration (1.145% ✅); Phase 3 render (6 maps); bilingual dark/light page (`site/index.html`); CALIBRATION.md; published to GitHub Pages.
+- 2026-06-27: EU-scoped reference refactor; country flags on maps; methodology text updated (EN+FR); 3 JS parse errors fixed (smart quotes + unescaped inner quotes); favicon cache-buster ?v=4; Design Projects launch.json `site/` bug fixed; Jun 26 + Jun 27 data added; page moved from `site/` to repo root.
 
 ## Pointers
-- Source proposal (as pasted): `../GUIDELINES_source_workflow.md`
-- Adversarial review (verified): `../CHALLENGE_extracted_workflow.md`
-- Active plan: `PLAN_reproduction_2026-06-25.md`
-- Brief: `../PROJECT_BRIEF.md`
-- Cold-start read order: MANIFEST.json → STATUS.md → active plans
-- Smoke test: `.venv/bin/python scripts/phase1_sanity.py` · Calibration: `.venv/bin/python scripts/phase2_calibration.py`
-- Loader API: `from src.loaders.ecmwf_opendata import load_daily_tmax` → normalized °C global grid (lat/lon)
-- Phase 2 API: `from src.core.france import metropolitan_france_mask` · `from src.core.threshold import france_threshold, planet_fraction_hotter`
-- ⚠️ Gotcha: cartopy's Natural Earth auto-downloader hit an SSL cert error (Py3.12/macOS); shapefiles
-  pre-fetched via certifi → cached at `~/.local/share/cartopy/shapefiles/natural_earth/` (no re-download needed).
-  Data source default = `source='google'` (AWS replica throttles downloads).
+- Brief: `PROJECT_BRIEF.md`
+- Calibration record: `CALIBRATION.md`
+- Plan (partially stale — core delivered): `PLAN_reproduction_2026-06-25.md`
+- Loader API: `from src.loaders.ecmwf_opendata import load_daily_tmax`
+- Render API: `from src.render.wapo_map import render_wapo_map`
+- Gotcha: cartopy NE shapefiles pre-fetched via certifi → `~/.local/share/cartopy/` (no re-download needed)
