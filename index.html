@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hotter than France — June 2026 European Heatwave</title>
+<title>Hotter than… — Summer 2026 European Heatwaves</title>
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=4">
 <link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=4">
 <link rel="shortcut icon" href="favicon.ico?v=4">
@@ -167,6 +167,16 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 .day-card--featured { grid-column: 1 / -1; }
 /* featured map already burns in its title + date, so drop the duplicate HTML header */
 .day-card--featured .day-card-header { display: none; }
+/* full-width divider heading that separates the "coming days" forecast group from past days */
+.days-group-heading {
+  grid-column: 1 / -1;
+  margin: 12px 0 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-light);
+  font-family: var(--font-display); font-weight: 600; font-size: 0.95rem;
+  letter-spacing: 0.02em; text-transform: uppercase;
+  color: var(--text-tertiary);
+}
 .model-note {
   margin-top: 16px; font-size: 0.78rem; font-style: italic;
   color: var(--text-tertiary); line-height: 1.55; max-width: 760px;
@@ -183,6 +193,15 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 }
 .day-label {
   font-family: var(--font-display); font-weight: 600; font-size: 1rem; color: var(--text-primary);
+}
+/* Forecast badge — subtle pill in the accent (heat) palette, next to the day label */
+.forecast-tag {
+  display: inline-block; margin-left: 8px; vertical-align: middle;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--heat-light); color: var(--heat-dark);
+  border: 1px solid var(--record-border);
+  font-family: var(--font-body); font-weight: 600; font-size: 0.62rem;
+  letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.3;
 }
 
 /* figure wraps map + stats caption */
@@ -328,7 +347,7 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
   <!-- HERO -->
   <section class="hero">
     <h1 class="hero-title" id="heroTitle">Hotter than France</h1>
-    <p class="hero-tagline" id="heroTagline">June 2026 — at the peak of the European heatwave, only a sliver of the planet was hotter than France's hottest place.</p>
+    <p class="hero-tagline" id="heroTagline">Summer 2026 — at the peak of each European heatwave, only a sliver of the planet was hotter than the continent's hottest place.</p>
   </section>
 
   <!-- RECORD CALLOUT -->
@@ -389,13 +408,30 @@ main { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
 // % of the globe strictly hotter than refMaxC. refIso3 = ISO3 lowercase = map filename prefix.
 // Reference country = hottest Continental European country that day (no threshold).
 // France appears as secondary overlay when it is not the hottest European country.
+// fcst:1 (optional) marks a FORECAST day — its grid comes from a future-horizon step of an
+//   earlier model run, not an analysed run. Forecast days show a "forecast" badge and are
+//   EXCLUDED from the page title / hero / featured map (those use the latest ACTUAL day).
+//   When the window is re-run after the date has passed, the entry is regenerated without
+//   fcst and becomes a normal actual day.
 var DATA = [
   {date:'2026-06-22', enDay:'Monday 22 June',    frDay:'lundi 22 juin',    refIso3:'esp', refEn:'Spain',   refFr:"l'Espagne", iso2:'ES', refMaxC:42.31, fraMaxC:41.5,  fraPct:1.14, planetPct:0.84},
   {date:'2026-06-23', enDay:'Tuesday 23 June',   frDay:'mardi 23 juin',    refIso3:'esp', refEn:'Spain',   refFr:"l'Espagne", iso2:'ES', refMaxC:43.85, fraMaxC:42.1,  fraPct:0.77, planetPct:0.34},
   {date:'2026-06-24', enDay:'Wednesday 24 June', frDay:'mercredi 24 juin', refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:42.04, planetPct:0.76},
   {date:'2026-06-25', enDay:'Thursday 25 June',  frDay:'jeudi 25 juin',    refIso3:'fra', refEn:'France',  refFr:'la France', iso2:'FR', refMaxC:40.15, planetPct:1.70},
   {date:'2026-06-26', enDay:'Friday 26 June',    frDay:'vendredi 26 juin', refIso3:'deu', refEn:'Germany', refFr:"l'Allemagne", iso2:'DE', refMaxC:38.86, fraMaxC:38.65, fraPct:2.34, planetPct:2.26},
-  {date:'2026-06-27', enDay:'Saturday 27 June',  frDay:'samedi 27 juin',   refIso3:'deu', refEn:'Germany', refFr:'l\'Allemagne', iso2:'DE', refMaxC:39.87, fraMaxC:39.34, fraPct:2.03, planetPct:1.82}
+  {date:'2026-06-27', enDay:'Saturday 27 June',  frDay:'samedi 27 juin',   refIso3:'deu', refEn:'Germany', refFr:'l\'Allemagne', iso2:'DE', refMaxC:39.87, fraMaxC:39.34, fraPct:2.03, planetPct:1.82},
+  {date:'2026-06-28', enDay:'Sunday 28 June', frDay:'dimanche 28 juin', refIso3:'deu', refEn:'Germany', refFr:"l'Allemagne", iso2:'DE', refMaxC:40.22, fraMaxC:38.82, fraPct:2.28, planetPct:1.64},
+  {date:'2026-06-29', enDay:'Monday 29 June', frDay:'lundi 29 juin', refIso3:'hun', refEn:'Hungary', refFr:"la Hongrie", iso2:'HU', refMaxC:40, fraMaxC:37.28, fraPct:3.1, planetPct:1.64},
+  {date:'2026-06-30', enDay:'Tuesday 30 June', frDay:'mardi 30 juin', refIso3:'hun', refEn:'Hungary', refFr:"la Hongrie", iso2:'HU', refMaxC:40.89, fraMaxC:36.89, fraPct:3.21, planetPct:1.25},
+  {date:'2026-07-01', enDay:'Wednesday 1 July', frDay:'mercredi 1 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:41.62, fraMaxC:37.17, fraPct:3, planetPct:1},
+  {date:'2026-07-02', enDay:'Thursday 2 July', frDay:'jeudi 2 juillet', refIso3:'prt', refEn:'Portugal', refFr:"le Portugal", iso2:'PT', refMaxC:42.25, fraMaxC:35.18, fraPct:4.12, planetPct:0.9},
+  {date:'2026-07-03', enDay:'Friday 3 July', frDay:'vendredi 3 juillet', refIso3:'prt', refEn:'Portugal', refFr:"le Portugal", iso2:'PT', refMaxC:41.63, fraMaxC:34.96, fraPct:4.6, planetPct:1.33},
+  {date:'2026-07-04', enDay:'Saturday 4 July', frDay:'samedi 4 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:41.59, fraMaxC:36.93, fraPct:3.52, planetPct:1.41},
+  {date:'2026-07-05', enDay:'Sunday 5 July', frDay:'dimanche 5 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:42.05, fraMaxC:39.02, fraPct:2.38, planetPct:1.22},
+  {date:'2026-07-06', enDay:'Monday 6 July', frDay:'lundi 6 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:41.77, fraMaxC:39.34, fraPct:2.34, planetPct:1.39},
+  {date:'2026-07-07', enDay:'Tuesday 7 July', frDay:'mardi 7 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:42.94, fraMaxC:39.5, fraPct:2.25, planetPct:0.87, fcst:1},
+  {date:'2026-07-08', enDay:'Wednesday 8 July', frDay:'mercredi 8 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:42.16, fraMaxC:40.87, fraPct:1.66, planetPct:1.07, fcst:1},
+  {date:'2026-07-09', enDay:'Thursday 9 July', frDay:'jeudi 9 juillet', refIso3:'esp', refEn:'Spain', refFr:"l'Espagne", iso2:'ES', refMaxC:42.39, fraMaxC:40.7, fraPct:1.67, planetPct:0.99, fcst:1}
 ];
 
 // ── I18N ──
@@ -406,6 +442,7 @@ var STRINGS = {
     refMax:               "Hottest point",
     planetHotter:         "Planet fraction hotter",
     mapPending:           "Map pending",
+    forecastTag:          "forecast",
     modelNote:            "Per-day values are the hottest 0.25° model grid cell (ECMWF IFS, 00 UTC run). At this resolution Tuesday and Wednesday are effectively tied (~42 °C); the official \"record broken\" figures are station observations — a separate measure.",
     methodTitle:          "How this was made",
     methodData:           "Global 2-metre maximum temperature from ECMWF’s IFS operational forecast (0.25°) — the same model family The Washington Post used.",
@@ -416,6 +453,7 @@ var STRINGS = {
     footerDataLabel:      "Data",
     footerGeneratedLabel: "Generated",
     dayPanelsLabel:       "Daily panels",
+    comingDays:           "Coming days (forecast)",
     themeBtnTitle:        "Toggle dark mode",
     langBtnTitle:         "Switch language",
     closeHint:            "Click anywhere to close",
@@ -428,6 +466,7 @@ var STRINGS = {
     refMax:               "Point le plus chaud",
     planetHotter:         "Part de planète plus chaude",
     mapPending:           "Carte à venir",
+    forecastTag:          "prévision",
     modelNote:            "Les valeurs quotidiennes correspondent à la cellule de grille la plus chaude du modèle (0,25°, IFS CEPMMT, run 00 UTC). À cette résolution, mardi et mercredi sont quasi à égalité (~42 °C) ; les records officiels « battus » sont des relevés de stations — une mesure distincte.",
     methodTitle:          "Méthode",
     methodData:           "Température maximale à 2 mètres, monde entier, issue de la prévision opérationnelle IFS du CEPMMT (0,25°) — la même famille de modèles que celle utilisée par le Washington Post.",
@@ -438,6 +477,7 @@ var STRINGS = {
     footerDataLabel:      "Données",
     footerGeneratedLabel: "Généré",
     dayPanelsLabel:       "Panneaux journaliers",
+    comingDays:           "Jours à venir (prévision)",
     themeBtnTitle:        "Basculer le mode sombre",
     langBtnTitle:         "Changer de langue",
     closeHint:            "Cliquez n’importe où pour fermer",
@@ -451,8 +491,17 @@ function t(k) {
   return (STRINGS[state.lang] && STRINGS[state.lang][k]) || STRINGS.en[k] || k;
 }
 
-// ── DYNAMIC TITLE / TAGLINE (uses latest DATA entry's country) ──
-function _latestDay() { return DATA.length ? DATA[DATA.length - 1] : null; }
+// ── DYNAMIC TITLE / TAGLINE (uses latest ACTUAL — non-forecast — DATA entry's country) ──
+// Forecast days (fcst) never drive the title/hero/featured map; they only appear in the grid.
+function _isForecast(d) { return !!(d && d.fcst); }
+function _latestActualDay() {
+  for (var i = DATA.length - 1; i >= 0; i--) {
+    if (!_isForecast(DATA[i])) return DATA[i];
+  }
+  return null; // no actual day yet
+}
+// Back-compat alias: every caller of _latestDay wants the latest ACTUAL day.
+function _latestDay() { return _latestActualDay(); }
 
 function flagEmoji(iso2) {
   if (!iso2) return '';
@@ -472,20 +521,29 @@ function titleFor(lang) {
     ? 'Plus chaud que ' + d.refFr
     : 'Hotter than ' + d.refEn;
 }
+var MONTHS_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+var MONTHS_FR = ['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+function monthYearFor(lang, d) {
+  if (!d || !d.date) return lang === 'fr' ? 'été 2026' : 'Summer 2026';
+  var m = parseInt(d.date.slice(5, 7), 10) - 1;
+  var y = d.date.slice(0, 4);
+  return lang === 'fr' ? MONTHS_FR[m] + ' ' + y : MONTHS_EN[m] + ' ' + y;
+}
 function taglineFor(lang) {
   var d = _latestDay();
   if (!d) return '';
   var pct = d.planetPct !== null ? d.planetPct.toFixed(2) : '?';
+  var my = monthYearFor(lang, d);
   return lang === 'fr'
-    ? 'Juin 2026 — seulement ' + pct + '% de la planète était plus chaud que ' + d.refFr + '.'
-    : 'June 2026 — only ' + pct + '% of the planet was hotter than ' + d.refEn + '’s hottest place.';
+    ? my.charAt(0).toUpperCase() + my.slice(1) + ' — seulement ' + pct + '% de la planète était plus chaud que ' + d.refFr + '.'
+    : my + ' — only ' + pct + '% of the planet was hotter than ' + d.refEn + '’s hottest place.';
 }
 function docTitleFor(lang) {
   var d = _latestDay();
-  if (!d) return 'Hotter than... — June 2026';
+  if (!d) return 'Hotter than... — Summer 2026';
   return lang === 'fr'
-    ? 'Plus chaud que ' + d.refFr + ' — canicule européenne, juin 2026'
-    : 'Hotter than ' + d.refEn + ' — June 2026 European heatwave';
+    ? 'Plus chaud que ' + d.refFr + ' — canicule européenne, ' + monthYearFor('fr', d)
+    : 'Hotter than ' + d.refEn + ' — ' + monthYearFor('en', d) + ' European heatwave';
 }
 
 // ── STATE (localStorage persistence) ──
@@ -558,6 +616,10 @@ function fmtStat(val, suffix) {
 // ── RENDER DAY PANELS ──
 function dayCardHtml(day, featured) {
   var dayLabel = state.lang === 'fr' ? day.frDay : day.enDay;
+  // Forecast badge markup (empty for actual days). Appended after the day label.
+  var fcstBadge = _isForecast(day)
+    ? '<span class="forecast-tag">' + t('forecastTag') + '</span>'
+    : '';
   // Theme- AND language-aware map; swapped on theme/lang toggle. Prefer an inlined
   // base64 map (standalone single-file build) when present, else the assets/ path.
   var mapKey   = day.date + '_' + state.theme + '_' + state.lang;
@@ -568,7 +630,7 @@ function dayCardHtml(day, featured) {
   return (
     '<article class="day-card' + (featured ? ' day-card--featured' : '') + '">' +
       '<div class="day-card-header">' +
-        '<span class="day-label">' + dayLabel + '</span>' +
+        '<span class="day-label">' + dayLabel + fcstBadge + '</span>' +
       '</div>' +
       '<figure class="day-figure">' +
         '<div class="day-map-wrap">' +
@@ -608,11 +670,29 @@ function renderDays() {
   var container = document.getElementById('days');
   if (!container) return;
   if (!DATA.length) { container.innerHTML = ''; return; }
-  var latest   = DATA[DATA.length - 1];                    // most recent day → featured, full width
-  var previous = DATA.slice(0, DATA.length - 1).reverse(); // the two prior days, newest first
-  var html = dayCardHtml(latest, true);
-  for (var i = 0; i < previous.length; i++) {
-    html += dayCardHtml(previous[i], false);
+  // Featured (full width) = latest ACTUAL day. Forecast days are never featured; they show in
+  // the grid with a badge. If there is no actual day yet, fall back to the most recent entry.
+  // Layout (chronological, no interleaving):
+  //   [featured latest actual]
+  //   past actual days, newest-first (strict descending)
+  //   ── "Coming days" divider ── then forecast days, soonest-first (ascending)
+  var featured = _latestActualDay() || DATA[DATA.length - 1];
+  var pastActuals = [];   // non-featured actual days, newest-first
+  var forecasts = [];     // forecast days, chronological ascending (as stored in DATA)
+  for (var i = DATA.length - 1; i >= 0; i--) {
+    if (DATA[i] === featured) continue;
+    if (_isForecast(DATA[i])) { forecasts.unshift(DATA[i]); }  // ascending: soonest first
+    else { pastActuals.push(DATA[i]); }                        // descending: newest first
+  }
+  var html = dayCardHtml(featured, true);
+  for (var j = 0; j < pastActuals.length; j++) {
+    html += dayCardHtml(pastActuals[j], false);
+  }
+  if (forecasts.length) {
+    html += '<h3 class="days-group-heading">' + t('comingDays') + '</h3>';
+    for (var k = 0; k < forecasts.length; k++) {
+      html += dayCardHtml(forecasts[k], false);
+    }
   }
   container.innerHTML = html;
 }
