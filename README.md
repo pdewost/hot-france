@@ -42,14 +42,61 @@ the "record broken" headlines refer to **station observations**, a separate meas
 ```bash
 # First-time setup
 python3 -m venv .venv && .venv/bin/pip install -r requirements.txt
+```
 
-# Add a new day (downloads GRIB, discovers EU ref, renders 4 maps, prints DATA entry)
-.venv/bin/python scripts/run_daily.py 2026-06-28
+### Primary: windowed update (`run_window.py`)
 
-# Paste the printed DATA entry into index.html, then commit and push:
-git add index.html assets/maps/hotter_than_*_2026-06-28_*.png
-git commit -m "data(2026-06-28): ..."
+`run_window.py` processes a sliding window of days in one pass — it refreshes the last few
+**actual** days *and* publishes a few **forecast** days ahead — then injects every resulting
+entry straight into `index.html` (no manual copy-paste), behind a `node` parse-check safety net.
+
+```bash
+# Default window: 2 days back … 3 days ahead of today (UTC)
+.venv/bin/python scripts/run_window.py
+
+# Wider backfill: 8 days back, 3 ahead, anchored on a specific day
+.venv/bin/python scripts/run_window.py --back 8 --ahead 3 --date 2026-07-06
+
+# See the plan without touching anything
+.venv/bin/python scripts/run_window.py --dry-run --back 8 --ahead 3
+
+# Only fill dates missing from DATA (don't re-render days already present)
+.venv/bin/python scripts/run_window.py --skip-existing
+```
+
+Flags: `--back N` (default 2), `--ahead M` (default 3), `--date YYYY-MM-DD` (anchor, default
+today UTC), `--dry-run`, `--skip-existing`.
+
+**Forecast days.** Any date beyond today's model run is fetched from the correct forecast
+horizon of an earlier run (offset steps), and its DATA entry is tagged `fcst:1`. On the page,
+forecast days show a small **"forecast" / "prévision"** badge and appear only in the day grid —
+they never drive the page title, hero line, or featured map (those always use the latest
+**actual** day). ECMWF's `mx2t3` reaches 5 days out, so `--ahead` is clamped to a 5-day horizon
+(a warning is printed; the run never crashes). When you re-run the window after a forecast date
+has passed, that day is regenerated from the analysed run and the `fcst` flag drops automatically
+— the line upgrades itself from forecast to actual in place.
+
+Injection is **idempotent** (re-running with the same inputs yields an identical file) and writes
+`index.html.bak` first; if the post-write `node` parse-check fails, the backup is restored and the
+command exits non-zero. Per-day fetch failures (e.g. an old date no longer on the open-data mirror)
+are logged and skipped, with an `OK / SKIPPED / FAILED` summary at the end — one bad day never
+aborts the whole window.
+
+```bash
+# After a run, commit the page + the new maps (maps are gitignored by default; force-add if needed):
+git add index.html assets/maps/hotter_than_*_2026-07-*.png
+git commit -m "data(window): refresh 2026-07-04 … 2026-07-09 (+forecasts)"
 git push
+```
+
+### Single day (`run_daily.py`)
+
+`run_daily.py` remains the one-day tool. It downloads the GRIB, discovers the EU reference,
+renders the 4 maps, and **prints** a ready-to-paste DATA entry (it does not modify `index.html`).
+
+```bash
+.venv/bin/python scripts/run_daily.py 2026-06-28
+# → paste the printed DATA entry into index.html, then commit + push (as above).
 ```
 
 ## Build the standalone file
