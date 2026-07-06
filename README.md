@@ -1,7 +1,7 @@
 # Hotter than … (EU heatwave maps) 🌡️
 
 A bilingual (FR/EN), dark/light web page reconstructing the viral *"only the places on Earth hotter
-than [country]"* maps for the **June 2026 European heatwave** — and an open, reproducible pipeline behind it.
+than [country]"* maps for the **Summer 2026 European heatwaves** — and an open, reproducible pipeline behind it.
 
 > **Live page:** https://pdewost.github.io/hot-france/
 > **Single-file version:** `hot-france-standalone.html` (everything inlined — open it anywhere, no server).
@@ -9,17 +9,13 @@ than [country]"* maps for the **June 2026 European heatwave** — and an open, r
 ## What it shows
 
 Each day we find the **hottest point in Continental Europe** and shade every place on Earth strictly
-hotter than it. France is always shown as a secondary overlay for reference.
-During the heatwave, only **0.3 – 2.3 %** of the planet's surface was hotter than the European peak.
+hotter than it. France is always shown as a secondary overlay for reference. Across the June and July
+heatwaves, only **0.3 – 2.3 %** of the planet's surface was hotter than the European peak on any given day.
 
-| Date | Reference country | Peak °C | % of planet hotter |
-|------|-------------------|--------:|-------------------:|
-| Mon 22 Jun | Spain   | 42.31 | 0.84 % |
-| Tue 23 Jun | Spain   | 43.85 | 0.34 % |
-| Wed 24 Jun | France  | 42.04 | 0.76 % |
-| Thu 25 Jun | France  | 40.15 | 1.70 % |
-| Fri 26 Jun | Germany | 38.86 | 2.26 % |
-| Sat 27 Jun | Germany | 39.87 | 1.82 % |
+**Coverage: 22 June 2026 → present**, updated with `run_window.py` (a few days back + a few forecast
+days ahead). The full day-by-day table — reference country, peak °C, planet fraction — lives on the
+[live page](https://pdewost.github.io/hot-france/); the underlying values are the `DATA` array in
+[`index.html`](index.html). Reference countries so far: Spain, France, Germany, Hungary, Portugal.
 
 ## Method (and how it was validated)
 
