@@ -4,6 +4,8 @@
 # Run by launchd (com.hotfrance.daily) every day at 10:30 Europe/Paris —
 # late enough that ECMWF's 00z run is published (~07-08 UTC); if it isn't,
 # the loader falls back to yesterday's run and tags the day fcst:1.
+# launchd never runs this file directly: it goes through scripts/launchd_entry.py
+# (python3.12 reads it, bash gets the text) — bash reading it itself gets EPERM.
 #
 # Steps: run_window.py (defaults: back 2 / ahead 3) → commit+push if changed
 # → post-push audit (tested scripts, per workspace domain rule #4) → iMessage
