@@ -28,3 +28,6 @@ venv/
 # Daily-routine logs
 logs/
 .daily_update.lock/
+
+# NEOCORTEX state — never published (Art. 5; this repo has a public remote). Untracked 2026-09-28.
+NEOCORTEX/
