@@ -12,10 +12,9 @@ Each day we find the **hottest point in Continental Europe** and shade every pla
 hotter than it. France is always shown as a secondary overlay for reference. Across the June and July
 heatwaves, only **0.3 – 2.3 %** of the planet's surface was hotter than the European peak on any given day.
 
-**Coverage: 22 June → 9 July 2026, then 26 September → 1 October 2026** (the last three days are
-forecasts). There is no data for 10 July → 25 September: the automated daily run was down over that
-period, and the gap was not backfilled. **Updates are paused for the season** (since 29 September 2026);
-the page stays online as a record of summer 2026. The full day-by-day table — reference country, peak °C, planet fraction — lives on the
+**Coverage: 22 June → 9 July 2026.** The last three days (7–9 July) are model forecasts that were never
+replaced by analysed values. **Updates have ended for the season** (29 September 2026); the page stays
+online as a record of the summer 2026 heatwaves. The full day-by-day table — reference country, peak °C, planet fraction — lives on the
 [live page](https://pdewost.github.io/hot-france/); the underlying values are the `DATA` array in
 [`index.html`](index.html). Reference countries so far: Spain, France, Germany, Hungary, Portugal.
 
